@@ -3,24 +3,27 @@ set -e
 
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
-# Pastikan script lainnya executable
+# Pastikan script di dalam direktori scripts executable
 chmod +x "$SCRIPT_DIR/scripts/"*.sh
 
-# 1. Jalankan env.sh untuk setup dependensi & gum
+# 1. Load helper functions & pastikan gum terpasang
 source "$SCRIPT_DIR/scripts/env.sh"
 
-# Clear terminal untuk tampilan TUI yang bersih
+# 2. Bersihkan terminal dan tampilkan Header TUI langsung di awal
 clear
 
-# 2. Tampilkan Header dengan gum style
 gum style \
 	--foreground 212 --border-foreground 212 --border double \
-	--align center --width 60 --margin "1 2" --padding "2 4" \
+	--align center --width 60 --margin "1 2" --padding "1 4" \
 	"FEDORA KDE 44 SETUP" "Personal System Setup & Automation"
 
-info "Selamat datang di Fedora Setup. Silakan pilih tugas yang ingin dijalankan:"
+# 3. Setup repository environment menggunakan spinner TUI
+gum spin --spinner dot --title "Menyiapkan repository RPM Fusion & Flathub..." -- bash -c "source '$SCRIPT_DIR/scripts/env.sh' && setup_environment_repos"
 
-# 3. Top-Level Menu
+echo ""
+info "Pilih tugas yang ingin Anda jalankan (Gunakan [Spasi] untuk memilih, [Enter] untuk konfirmasi):"
+
+# 4. Top-Level Menu Interaktif TUI
 CHOICES=$(gum choose --no-limit \
     "Setup Shell & Terminal (Zsh, Starship, Dotfiles)" \
     "Install System Essentials & Media Codecs" \
@@ -32,29 +35,37 @@ if [ -z "$CHOICES" ]; then
     exit 0
 fi
 
-# Eksekusi dengan progres spinner palsu (agar sesuai estetika permintaan), atau jalankan skrip
-echo "$CHOICES" | while read -r choice; do
-    case "$choice" in
+# 5. Konversi pilihan ke array agar stdin (TTY) tidak terdistorsi untuk sub-menu interaktif
+mapfile -t SELECTED_TASKS <<< "$CHOICES"
+
+for task in "${SELECTED_TASKS[@]}"; do
+    [ -z "$task" ] && continue
+    case "$task" in
         "Setup Shell & Terminal (Zsh, Starship, Dotfiles)")
-            gum spin --spinner dot --title "Memulai Setup Shell & Terminal..." -- sleep 1
+            echo ""
+            gum style --foreground 99 --bold ">>> Menjalankan Setup Shell & Terminal..."
             "$SCRIPT_DIR/scripts/setup_terminal.sh"
             ;;
         "Install System Essentials & Media Codecs")
-            gum spin --spinner dot --title "Memulai Instalasi System Essentials & Media Codecs..." -- sleep 1
+            echo ""
+            gum style --foreground 99 --bold ">>> Menjalankan Instalasi System Essentials & Media Codecs..."
             "$SCRIPT_DIR/scripts/system_essentials.sh"
             ;;
         "Install Aplikasi RPM (DNF / Official Repos)")
-            gum spin --spinner dot --title "Memulai Instalasi Aplikasi RPM..." -- sleep 1
+            echo ""
+            gum style --foreground 99 --bold ">>> Menjalankan Instalasi Aplikasi RPM..."
             "$SCRIPT_DIR/scripts/rpm_apps.sh"
             ;;
         "Install Aplikasi Flatpak (Flathub)")
-            gum spin --spinner dot --title "Memulai Instalasi Aplikasi Flatpak..." -- sleep 1
+            echo ""
+            gum style --foreground 99 --bold ">>> Menjalankan Instalasi Aplikasi Flatpak..."
             "$SCRIPT_DIR/scripts/flatpak_apps.sh"
             ;;
     esac
 done
 
 echo ""
-success "================================================="
-success "  Semua tugas yang dipilih telah selesai!"
-success "================================================="
+gum style \
+	--foreground 82 --border-foreground 82 --border rounded \
+	--align center --width 60 --padding "1 2" \
+	"SETUP SELESAI!" "Semua tugas yang dipilih berhasil dikonfigurasi."

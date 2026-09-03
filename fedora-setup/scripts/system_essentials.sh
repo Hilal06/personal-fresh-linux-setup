@@ -3,7 +3,7 @@ set -e
 
 source "$(dirname "$0")/env.sh"
 
-info "Pilih modul System Essentials & Media Codecs yang ingin diinstall:"
+info "Pilih modul System Essentials & Media Codecs yang ingin diinstall (Spasi untuk memilih, Enter untuk konfirmasi):"
 
 CHOICES=$(gum choose --no-limit \
     "Multimedia Codecs Lengkap (FFmpeg, GStreamer, libdvdcss, Audio/Video Extras)" \
@@ -16,11 +16,13 @@ if [ -z "$CHOICES" ]; then
     exit 0
 fi
 
-echo "$CHOICES" | while read -r choice; do
+mapfile -t SELECTED_OPTS <<< "$CHOICES"
+
+for choice in "${SELECTED_OPTS[@]}"; do
+    [ -z "$choice" ] && continue
     case "$choice" in
         "Multimedia Codecs Lengkap"*)
             info "Menginstall Multimedia Codecs Lengkap..."
-            # Menukar ffmpeg-free dengan versi lengkap ffmpeg dari RPM Fusion
             gum spin --spinner dot --title "Mengganti ffmpeg-free dengan full FFmpeg (RPM Fusion)..." -- \
                 sudo dnf swap -y ffmpeg-free ffmpeg --allowerasing || true
 
@@ -41,7 +43,6 @@ echo "$CHOICES" | while read -r choice; do
             ;;
         "Hardware Video Acceleration / Drivers"*)
             info "Mengonfigurasi Hardware Video Acceleration Drivers..."
-            # Swap Mesa drivers ke freeworld untuk akselerasi hardware codec tertutup (H.264/H.265/VC-1)
             gum spin --spinner dot --title "Mengganti Mesa drivers dengan freeworld (RPM Fusion)..." -- \
                 sudo dnf swap -y mesa-va-drivers mesa-va-drivers-freeworld --allowerasing || true
             gum spin --spinner dot --title "Mengganti Mesa VDPAU drivers dengan freeworld..." -- \

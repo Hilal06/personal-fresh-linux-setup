@@ -22,30 +22,44 @@ if ! command -v dnf &>/dev/null; then
     error "DNF package manager tidak ditemukan. Skrip ini ditujukan untuk Fedora."
 fi
 
-# Memastikan gum terinstall
-if ! command -v gum &> /dev/null; then
-    info "gum tidak ditemukan. Menginstall gum dari repositori resmi..."
-    sudo dnf install -y gum
-    success "gum berhasil diinstall."
+# Memastikan gum terinstall (dibutuhkan untuk TUI)
+ensure_gum_installed() {
+    if ! command -v gum &> /dev/null; then
+        info "gum belum terpasang. Menginstall gum dari repositori resmi..."
+        sudo dnf install -y gum >/dev/null 2>&1 || sudo dnf install -y gum
+        success "gum berhasil diinstall."
+    fi
+}
+
+# Fungsi inisialisasi repositori (RPM Fusion & Flathub)
+setup_environment_repos() {
+    info "Menyiapkan repository RPM Fusion & Flathub..."
+
+    # RPM Fusion Free & Non-Free
+    local FEDORA_VER
+    FEDORA_VER="$(rpm -E %fedora)"
+    sudo dnf install -y \
+        "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-${FEDORA_VER}.noarch.rpm" \
+        "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-${FEDORA_VER}.noarch.rpm" >/dev/null 2>&1 || true
+
+    # RPM Fusion Tainted
+    sudo dnf install -y rpmfusion-free-release-tainted rpmfusion-nonfree-release-tainted >/dev/null 2>&1 || true
+
+    # Flathub
+    if ! command -v flatpak &> /dev/null; then
+        sudo dnf install -y flatpak >/dev/null 2>&1
+    fi
+    sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo >/dev/null 2>&1 || true
+
+    # Refresh metadata
+    sudo dnf makecache --refresh >/dev/null 2>&1 || true
+    sudo flatpak update --appstream >/dev/null 2>&1 || true
+}
+
+ensure_gum_installed
+
+# Jalankan setup_environment_repos langsung hanya jika skrip ini dieksekusi secara independen
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    setup_environment_repos
+    success "Inisialisasi environment repositori selesai."
 fi
-
-# Menambahkan RPM Fusion (Free & Non-Free)
-info "Memastikan repository RPM Fusion terpasang..."
-sudo dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm || true
-
-# Menambahkan RPM Fusion Tainted (untuk codec proprietary seperti libdvdcss)
-info "Memastikan repository RPM Fusion Tainted aktif..."
-sudo dnf install -y rpmfusion-free-release-tainted rpmfusion-nonfree-release-tainted || true
-
-# Menambahkan Flathub
-info "Memastikan repository Flathub tersedia..."
-if ! command -v flatpak &> /dev/null; then
-    warn "Flatpak belum terinstall. Menginstall flatpak..."
-    sudo dnf install -y flatpak
-fi
-sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-
-# Update Metadata
-info "Melakukan update metadata DNF dan Flatpak..."
-sudo dnf makecache
-sudo flatpak update -y

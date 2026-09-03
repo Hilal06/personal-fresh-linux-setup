@@ -3,9 +3,8 @@ set -e
 
 source "$(dirname "$0")/env.sh"
 
-info "Pilih aplikasi berbasis RPM (DNF) yang ingin diinstall:"
+info "Pilih aplikasi berbasis RPM (DNF) yang ingin diinstall (Spasi untuk memilih, Enter untuk konfirmasi):"
 
-# Menggunakan \n delimiter untuk multiple choice karena gum choose per line
 CHOICES=$(gum choose --no-limit \
     "Development Tools (gcc, make, git, curl, wget, cmake)" \
     "Visual Studio Code" \
@@ -18,8 +17,10 @@ if [ -z "$CHOICES" ]; then
     exit 0
 fi
 
-# Loop setiap baris yang dipilih
-echo "$CHOICES" | while read -r choice; do
+mapfile -t SELECTED_APPS <<< "$CHOICES"
+
+for choice in "${SELECTED_APPS[@]}"; do
+    [ -z "$choice" ] && continue
     case "$choice" in
         "Development Tools"*)
             info "Menginstall Development Tools..."
