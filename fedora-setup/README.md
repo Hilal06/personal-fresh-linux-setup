@@ -19,12 +19,16 @@ fedora-setup/
 ├── README.md                # Dokumentasi proyek
 ├── scripts/
 │   ├── env.sh               # Konfigurasi repository (RPM Fusion Tainted, Flathub) & Gum
+│   ├── setup_terminal.sh    # Setup Zsh, Starship, plugins, CLI tools, & dotfiles
+│   ├── zsh.sh               # Wrapper kompatibilitas ke setup_terminal.sh
 │   ├── system_essentials.sh # Multimedia codecs, hardware acceleration, & KDE tools
-│   ├── zsh.sh               # Instalasi Zsh & konfigurasi default shell
 │   ├── rpm_apps.sh          # Menu TUI instalasi aplikasi via DNF
 │   └── flatpak_apps.sh      # Menu TUI instalasi aplikasi via Flatpak
-└── configs/
-    └── .zshrc               # Dotfiles konfigurasi Zsh
+├── configs/
+│   ├── .zshrc               # Dotfiles konfigurasi Zsh
+│   └── starship.toml        # Konfigurasi tema & prompt Starship
+└── docs/
+    └── software-development-list.txt # Daftar referensi software & tools
 ```
 
 ## 🛠 Prasyarat Sistem

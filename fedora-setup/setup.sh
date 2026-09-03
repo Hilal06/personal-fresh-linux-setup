@@ -22,7 +22,7 @@ info "Selamat datang di Fedora Setup. Silakan pilih tugas yang ingin dijalankan:
 
 # 3. Top-Level Menu
 CHOICES=$(gum choose --no-limit \
-    "Setup Shell (Zsh & Dotfiles)" \
+    "Setup Shell & Terminal (Zsh, Starship, Dotfiles)" \
     "Install System Essentials & Media Codecs" \
     "Install Aplikasi RPM (DNF / Official Repos)" \
     "Install Aplikasi Flatpak (Flathub)")
@@ -35,9 +35,9 @@ fi
 # Eksekusi dengan progres spinner palsu (agar sesuai estetika permintaan), atau jalankan skrip
 echo "$CHOICES" | while read -r choice; do
     case "$choice" in
-        "Setup Shell (Zsh & Dotfiles)")
-            gum spin --spinner dot --title "Memulai Setup Shell..." -- sleep 1
-            "$SCRIPT_DIR/scripts/zsh.sh"
+        "Setup Shell & Terminal (Zsh, Starship, Dotfiles)")
+            gum spin --spinner dot --title "Memulai Setup Shell & Terminal..." -- sleep 1
+            "$SCRIPT_DIR/scripts/setup_terminal.sh"
             ;;
         "Install System Essentials & Media Codecs")
             gum spin --spinner dot --title "Memulai Instalasi System Essentials & Media Codecs..." -- sleep 1

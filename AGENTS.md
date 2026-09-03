@@ -27,4 +27,4 @@ Always check for available package managers before executing installation comman
 
 ### 3. Modularity & Organization
 * Keep individual setup domains organized (e.g. terminal setup, development tools, GUI applications).
-* Maintain sync with [software-development-list.txt](file:///home/faulfedora/Documents/Script/personal-fresh-linux-setup/software-development-list.txt) when adding or modifying installation modules.
+* Maintain sync with [software-development-list.txt](file:///home/faulfedora/Documents/Script/personal-fresh-linux-setup/fedora-setup/docs/software-development-list.txt) when adding or modifying installation modules.
