@@ -1,0 +1,34 @@
+Visual Studio Code
+Arduino IDE
+Neovim
+GNU Nano
+Node.js
+npm
+Python
+PHP
+Composer
+Rust (Cargo)
+Java (OpenJDK)
+GCC / G++
+Clang
+CMake
+GNU Make
+DBeaver Community Edition
+Bruno
+SQLite
+MariaDB / MySQL Client
+Docker
+Podman
+Podman Desktop
+Git
+Zsh
+ripgrep
+fzf
+eza
+bat
+jq
+curl
+Google Antigravity CLI
+Tabnine
+Logseq
+LocalSend
