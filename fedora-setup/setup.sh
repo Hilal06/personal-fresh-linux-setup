@@ -14,19 +14,16 @@ sudo -v
 
 # 2. Bersihkan terminal dan tampilkan Header TUI langsung di awal
 clear
-
-BIGTEXT_FILE="$SCRIPT_DIR/configs/bigtext.txt"
-[ ! -f "$BIGTEXT_FILE" ] && BIGTEXT_FILE="$SCRIPT_DIR/../bigtext"
-
-if [ -f "$BIGTEXT_FILE" ]; then
-    echo ""
-    gum style --foreground 39 --bold --align center "$(< "$BIGTEXT_FILE")"
-fi
+echo ""
 
 gum style \
 	--foreground 212 --border-foreground 212 --border rounded \
 	--align center --width 64 --margin "0 2 1 2" --padding "1 2" --bold \
-	"Fresh Fedora KDE Utillity" "Personal System Setup & Automation Suite"
+	"$(gum style --foreground 39 --bold '█░█ █ █░░ ▄▀█ █░░ █▀█ █▄▄')" \
+	"$(gum style --foreground 39 --bold '█▀█ █ █▄▄ █▀█ █▄▄ █▄█ █▄█')" \
+	"" \
+	"Fresh Fedora KDE Utillity" \
+	"Personal System Setup & Automation Suite"
 
 # 3. Setup repository environment menggunakan spinner TUI (cepat & non-blocking)
 gum spin --spinner dot --title "Menyiapkan konfigurasi DNF, RPM Fusion & Flathub..." -- bash -c "source '$SCRIPT_DIR/scripts/env.sh' && setup_environment_repos"

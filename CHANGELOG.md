@@ -4,6 +4,13 @@ Dokumentasi riwayat pembaruan dan otomasi commit proyek `personal-fresh-linux-se
 
 ---
 
+### 🚀 [2026-09-04 14:16:08] - style(tui): enclose bigtext inside centered Fresh Fedora KDE Utillity frame
+
+- **Author**: Rifaul <rifaulhilal06@gmail.com>
+- **Branch**: main
+- **Files Changed**:
+  -  M fedora-setup/setup.sh
+
 ### 🚀 [2026-09-04 14:12:27] - style(tui): add bigtext header, update title to Fresh Fedora KDE Utillity, and beautify banners
 
 - **Author**: Rifaul <rifaulhilal06@gmail.com>
