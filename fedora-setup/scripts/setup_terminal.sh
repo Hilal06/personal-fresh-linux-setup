@@ -38,7 +38,94 @@ install_cli_tools() {
     fi
 }
 
-# 2. Setup Folder & Clone Zsh Plugins
+# 2. Install & Verifikasi FiraCode Nerd Font (Wajib untuk Starship & Glyphs)
+install_firacode_nerd_font() {
+    info "Memeriksa instalasi FiraCode Nerd Font..."
+
+    # Cek apakah font sudah terdeteksi di sistem
+    if fc-list : family | grep -qi "FiraCode Nerd Font"; then
+        success "FiraCode Nerd Font sudah terinstall di sistem."
+        return 0
+    fi
+
+    info "FiraCode Nerd Font belum ditemukan. Memulai proses instalasi..."
+
+    local INSTALLED=false
+
+    # Coba via package manager terlebih dahulu jika tersedia
+    if command -v pacman &>/dev/null; then
+        info "Menginstall ttf-firacode-nerd via pacman..."
+        sudo pacman -S --noconfirm ttf-firacode-nerd >/dev/null 2>&1 && INSTALLED=true || true
+    fi
+
+    # Fallback / Instalasi langsung dari rilis resmi Nerd Fonts GitHub
+    if [ "$INSTALLED" = false ]; then
+        info "Mengunduh FiraCode Nerd Font dari rilis resmi GitHub..."
+        local FONT_DIR="$HOME/.local/share/fonts/NerdFonts"
+        local TEMP_DIR
+        TEMP_DIR="$(mktemp -d)"
+
+        mkdir -p "$FONT_DIR"
+
+        if curl -fLo "$TEMP_DIR/FiraCode.zip" "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip"; then
+            info "Mengekstrak FiraCode Nerd Font ke $FONT_DIR..."
+            unzip -q -o "$TEMP_DIR/FiraCode.zip" -d "$FONT_DIR" "*.ttf" || unzip -q -o "$TEMP_DIR/FiraCode.zip" -d "$FONT_DIR"
+            INSTALLED=true
+        else
+            warn "Gagal mengunduh FiraCode Nerd Font dari GitHub."
+        fi
+
+        rm -rf "$TEMP_DIR"
+    fi
+
+    # Refresh font cache
+    if command -v fc-cache &>/dev/null; then
+        info "Memperbarui cache font sistem (fc-cache)..."
+        fc-cache -f "$HOME/.local/share/fonts" 2>/dev/null || fc-cache -f 2>/dev/null || true
+    fi
+
+    # Verifikasi akhir
+    if fc-list : family | grep -qi "FiraCode Nerd Font"; then
+        success "FiraCode Nerd Font berhasil diinstall dan siap digunakan!"
+    else
+        warn "Instalasi font selesai, pastikan mengatur font terminal Anda ke 'FiraCode Nerd Font'."
+    fi
+
+    # Auto-set font untuk KDE Konsole jika pengguna berada di KDE Plasma
+    configure_kde_konsole_font
+}
+
+# 3. Konfigurasi Otomatis Font Konsole KDE
+configure_kde_konsole_font() {
+    local KWRITE_BIN
+    KWRITE_BIN="$(command -v kwriteconfig6 || command -v kwriteconfig5 || true)"
+
+    if [ -n "$KWRITE_BIN" ] && [ -d "$HOME/.local/share/konsole" ]; then
+        info "Mendeteksi lingkungan KDE Plasma. Mengonfigurasi font Konsole..."
+        local KONSOLE_RC="$HOME/.config/konsolerc"
+        local PROFILE_NAME=""
+
+        # Cari default profile aktif dari konsolerc
+        if [ -f "$KONSOLE_RC" ]; then
+            PROFILE_NAME="$(grep "^DefaultProfile=" "$KONSOLE_RC" 2>/dev/null | cut -d'=' -f2 || true)"
+        fi
+
+        # Fallback profile jika tidak ditemukan
+        if [ -z "$PROFILE_NAME" ]; then
+            PROFILE_NAME="Personal.profile"
+            mkdir -p "$HOME/.local/share/konsole"
+            "$KWRITE_BIN" --file "$KONSOLE_RC" --group "Desktop Entry" --key "DefaultProfile" "$PROFILE_NAME"
+        fi
+
+        local PROFILE_PATH="$HOME/.local/share/konsole/$PROFILE_NAME"
+        info "Menerapkan 'FiraCode Nerd Font' ke profile Konsole: $PROFILE_NAME..."
+        "$KWRITE_BIN" --file "$PROFILE_PATH" --group "Appearance" --key "Font" "FiraCode Nerd Font,11,-1,5,700,0,0,0,0,0,0,0,0,0,0,1,Bold"
+        "$KWRITE_BIN" --file "$PROFILE_PATH" --group "Appearance" --key "UseFontLineChararacters" "false"
+        success "Font KDE Konsole berhasil diatur ke FiraCode Nerd Font."
+    fi
+}
+
+# 3. Setup Folder & Clone Zsh Plugins
 setup_plugins() {
     info "Menyiapkan plugin Zsh..."
     local PLUGIN_DIR="$HOME/.zsh/plugins"
@@ -75,17 +162,21 @@ setup_plugins() {
     success "Semua plugin Zsh siap digunakan."
 }
 
-# 3. Setup Konfigurasi Starship (~/.config/starship.toml)
+# 4. Setup Konfigurasi Starship (~/.config/starship.toml)
 deploy_starship_config() {
     local SOURCE_STARSHIP="$CONFIGS_DIR/starship.toml"
     local TARGET_STARSHIP="$HOME/.config/starship.toml"
+    local BACKUP_DIR="$HOME/.dotfiles_backup"
 
-    mkdir -p "$HOME/.config"
+    mkdir -p "$HOME/.config" "$BACKUP_DIR"
 
     if [ -f "$TARGET_STARSHIP" ]; then
-        local BACKUP_STARSHIP="$HOME/.config/starship.toml.backup.$(date +%Y%m%d%H%M%S)"
+        local TIMESTAMP
+        TIMESTAMP="$(date +%Y%m%d%H%M%S)"
+        local BACKUP_STARSHIP="$BACKUP_DIR/starship.toml.backup.$TIMESTAMP"
         cp "$TARGET_STARSHIP" "$BACKUP_STARSHIP"
-        info "Backup konfigurasi starship lama dibuat di: $BACKUP_STARSHIP"
+        cp "$TARGET_STARSHIP" "$BACKUP_DIR/starship.toml.latest"
+        info "Backup konfigurasi starship tersimpan aman di: $BACKUP_STARSHIP"
     fi
 
     if [ -f "$SOURCE_STARSHIP" ]; then
@@ -96,17 +187,21 @@ deploy_starship_config() {
     fi
 }
 
-# 4. Setup Konfigurasi Zsh (~/.zshrc)
+# 5. Setup Konfigurasi Zsh (~/.zshrc)
 deploy_zshrc_config() {
     local SOURCE_ZSHRC="$CONFIGS_DIR/.zshrc"
     local TARGET_ZSHRC="$HOME/.zshrc"
+    local BACKUP_DIR="$HOME/.dotfiles_backup"
 
-    mkdir -p "$HOME/ZoxideBackup"
+    mkdir -p "$HOME/ZoxideBackup" "$BACKUP_DIR"
 
     if [ -f "$TARGET_ZSHRC" ]; then
-        local BACKUP_ZSHRC="$HOME/.zshrc.backup.$(date +%Y%m%d%H%M%S)"
+        local TIMESTAMP
+        TIMESTAMP="$(date +%Y%m%d%H%M%S)"
+        local BACKUP_ZSHRC="$BACKUP_DIR/.zshrc.backup.$TIMESTAMP"
         cp "$TARGET_ZSHRC" "$BACKUP_ZSHRC"
-        info "Backup ~/.zshrc lama dibuat di: $BACKUP_ZSHRC"
+        cp "$TARGET_ZSHRC" "$BACKUP_DIR/.zshrc.latest"
+        info "Backup ~/.zshrc tersimpan aman di: $BACKUP_ZSHRC"
     fi
 
     if [ -f "$SOURCE_ZSHRC" ]; then
@@ -117,7 +212,7 @@ deploy_zshrc_config() {
     fi
 }
 
-# 5. Ubah Default Shell ke Zsh
+# 6. Ubah Default Shell ke Zsh
 set_default_shell() {
     local ZSH_PATH
     ZSH_PATH="$(command -v zsh || true)"
@@ -135,8 +230,68 @@ set_default_shell() {
     fi
 }
 
+# 7. Konfigurasi Git Identity & SSH Key Generator
+configure_git_and_ssh() {
+    if ! command -v git &>/dev/null; then
+        return 0
+    fi
+
+    if gum confirm "Apakah Anda ingin mengonfigurasi identitas Git & generate SSH Key (GitHub)?"; then
+        echo ""
+        gum style --foreground 99 --bold ">>> Konfigurasi Git & SSH Key Developer..."
+        
+        local CURRENT_NAME CURRENT_EMAIL
+        CURRENT_NAME="$(git config --global user.name 2>/dev/null || echo '')"
+        CURRENT_EMAIL="$(git config --global user.email 2>/dev/null || echo '')"
+
+        local GIT_NAME GIT_EMAIL
+        GIT_NAME=$(gum input --placeholder "Nama Lengkap untuk Git commit" --value "$CURRENT_NAME" --header "Masukkan Nama Git:")
+        GIT_EMAIL=$(gum input --placeholder "Email untuk Git commit" --value "$CURRENT_EMAIL" --header "Masukkan Email Git:")
+
+        if [ -n "$GIT_NAME" ]; then
+            git config --global user.name "$GIT_NAME"
+            git config --global init.defaultBranch main
+            success "Git user.name diatur ke: $GIT_NAME"
+        fi
+
+        if [ -n "$GIT_EMAIL" ]; then
+            git config --global user.email "$GIT_EMAIL"
+            success "Git user.email diatur ke: $GIT_EMAIL"
+        fi
+
+        # Generate SSH key jika belum ada
+        local SSH_KEY="$HOME/.ssh/id_ed25519"
+        if [ ! -f "$SSH_KEY" ]; then
+            if gum confirm "Generate SSH Key baru (ed25519) untuk GitHub/GitLab?"; then
+                mkdir -p "$HOME/.ssh"
+                chmod 700 "$HOME/.ssh"
+                local SSH_COMMENT="${GIT_EMAIL:-$USER@fedora}"
+                ssh-keygen -t ed25519 -C "$SSH_COMMENT" -f "$SSH_KEY" -N ""
+                eval "$(ssh-agent -s)" >/dev/null 2>&1 || true
+                ssh-add "$SSH_KEY" >/dev/null 2>&1 || true
+                
+                echo ""
+                success "SSH Key ed25519 berhasil dibuat di: $SSH_KEY"
+                gum style --border rounded --padding "1 2" --border-foreground 82 \
+                    "PUBLIC SSH KEY ANDA (Copy ke GitHub Settings -> SSH and GPG Keys):" \
+                    "$(cat "$SSH_KEY.pub")"
+            fi
+        else
+            info "SSH Key ed25519 sudah tersedia di: $SSH_KEY"
+            if gum confirm "Tampilkan Public SSH Key Anda sekarang?"; then
+                gum style --border rounded --padding "1 2" --border-foreground 82 \
+                    "PUBLIC SSH KEY ANDA:" \
+                    "$(cat "$SSH_KEY.pub")"
+            fi
+        fi
+    else
+        info "Melewati konfigurasi Git & SSH."
+    fi
+}
+
 # Eksekusi
 install_cli_tools
+install_firacode_nerd_font
 setup_plugins
 
 if gum confirm "Terapkan file konfigurasi dotfiles (starship.toml & .zshrc)?"; then
@@ -146,6 +301,7 @@ else
     info "Melewati penyalinan dotfiles terminal."
 fi
 
+configure_git_and_ssh
 set_default_shell
 
 echo ""

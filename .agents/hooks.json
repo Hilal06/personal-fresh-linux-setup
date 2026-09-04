@@ -1,0 +1,40 @@
+{
+  "bash-syntax-guard": {
+    "PostToolUse": [
+      {
+        "matcher": "replace_file_content",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'for f in fedora-setup/scripts/*.sh fedora-setup/*.sh; do [ -f \"$f\" ] && bash -n \"$f\" || exit 1; done'",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "write_to_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'for f in fedora-setup/scripts/*.sh fedora-setup/*.sh; do [ -f \"$f\" ] && bash -n \"$f\" || exit 1; done'",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  },
+  "secret-leak-guard": {
+    "PreToolUse": [
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'git status --porcelain | grep -E \"\\.env|id_ed25519|mcp_config\\.json\" | grep -v \"^!!\" && { echo \"[SECURITY ERROR] Potential secret file staged or tracked!\"; exit 1; } || exit 0'",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

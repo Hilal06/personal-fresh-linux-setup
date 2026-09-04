@@ -7,7 +7,12 @@ info "Pilih aplikasi berbasis Flatpak (Flathub) yang ingin diinstall (Spasi untu
 
 CHOICES=$(gum choose --no-limit \
     "Google Chrome" \
+    "ONLYOFFICE Desktop Editors" \
+    "Thunderbird Mail ESR" \
     "Discord" \
+    "Spotube (Spotify Client)" \
+    "VLC Media Player" \
+    "Pika Backup" \
     "DBeaver Community" \
     "Bruno API Client" \
     "Logseq" \
@@ -29,9 +34,29 @@ for choice in "${SELECTED_APPS[@]}"; do
             info "Menginstall Google Chrome..."
             sudo flatpak install -y flathub com.google.Chrome
             ;;
+        "ONLYOFFICE Desktop Editors")
+            info "Menginstall ONLYOFFICE Desktop Editors..."
+            sudo flatpak install -y flathub org.onlyoffice.desktopeditors
+            ;;
+        "Thunderbird Mail ESR")
+            info "Menginstall Thunderbird Mail ESR..."
+            sudo flatpak install -y flathub org.mozilla.thunderbird_esr
+            ;;
         "Discord")
             info "Menginstall Discord..."
             sudo flatpak install -y flathub com.discordapp.Discord
+            ;;
+        "Spotube (Spotify Client)")
+            info "Menginstall Spotube..."
+            sudo flatpak install -y flathub com.github.KRTirtho.Spotube
+            ;;
+        "VLC Media Player")
+            info "Menginstall VLC Media Player..."
+            sudo flatpak install -y flathub org.videolan.vlc
+            ;;
+        "Pika Backup")
+            info "Menginstall Pika Backup..."
+            sudo flatpak install -y flathub org.gnome.World.PikaBackup
             ;;
         "DBeaver Community")
             info "Menginstall DBeaver Community..."

@@ -1,0 +1,6 @@
+# Local environment & secret files
+.env
+.env.local
+*.backup.*
+*.latest
+.agents/plugins/project-mcp-tools/mcp_config.json

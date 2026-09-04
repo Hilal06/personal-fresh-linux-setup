@@ -31,29 +31,56 @@ ensure_gum_installed() {
     fi
 }
 
-# Fungsi inisialisasi repositori (RPM Fusion & Flathub)
-setup_environment_repos() {
-    info "Menyiapkan repository RPM Fusion & Flathub..."
-
-    # RPM Fusion Free & Non-Free
-    local FEDORA_VER
-    FEDORA_VER="$(rpm -E %fedora)"
-    sudo dnf install -y \
-        "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-${FEDORA_VER}.noarch.rpm" \
-        "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-${FEDORA_VER}.noarch.rpm" >/dev/null 2>&1 || true
-
-    # RPM Fusion Tainted
-    sudo dnf install -y rpmfusion-free-release-tainted rpmfusion-nonfree-release-tainted >/dev/null 2>&1 || true
-
-    # Flathub
-    if ! command -v flatpak &> /dev/null; then
-        sudo dnf install -y flatpak >/dev/null 2>&1
+# Fungsi optimasi performa DNF (/etc/dnf/dnf.conf)
+optimize_dnf_performance() {
+    local DNF_CONF="/etc/dnf/dnf.conf"
+    if [ -f "$DNF_CONF" ]; then
+        local MODIFIED=false
+        if ! grep -q "^max_parallel_downloads" "$DNF_CONF"; then
+            echo "max_parallel_downloads=10" | sudo tee -a "$DNF_CONF" >/dev/null
+            MODIFIED=true
+        fi
+        if ! grep -q "^fastestmirror" "$DNF_CONF"; then
+            echo "fastestmirror=True" | sudo tee -a "$DNF_CONF" >/dev/null
+            MODIFIED=true
+        fi
+        if ! grep -q "^defaultyes" "$DNF_CONF"; then
+            echo "defaultyes=True" | sudo tee -a "$DNF_CONF" >/dev/null
+            MODIFIED=true
+        fi
+        if [ "$MODIFIED" = true ]; then
+            info "Optimasi konfigurasi DNF (/etc/dnf/dnf.conf) berhasil diterapkan."
+        fi
     fi
-    sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo >/dev/null 2>&1 || true
+}
 
-    # Refresh metadata
-    sudo dnf makecache --refresh >/dev/null 2>&1 || true
-    sudo flatpak update --appstream >/dev/null 2>&1 || true
+# Fungsi inisialisasi repositori (RPM Fusion & Flathub) secara cepat & idempoten
+setup_environment_repos() {
+    optimize_dnf_performance
+
+    # 1. Periksa apakah RPM Fusion sudah terpasang
+    if ! rpm -q rpmfusion-free-release &>/dev/null || ! rpm -q rpmfusion-nonfree-release &>/dev/null; then
+        info "Menginstall RPM Fusion Free & Non-Free..."
+        local FEDORA_VER
+        FEDORA_VER="$(rpm -E %fedora)"
+        sudo dnf install -y \
+            "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-${FEDORA_VER}.noarch.rpm" \
+            "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-${FEDORA_VER}.noarch.rpm" >/dev/null 2>&1 || true
+    fi
+
+    # 2. Periksa RPM Fusion Tainted
+    if ! rpm -q rpmfusion-free-release-tainted &>/dev/null || ! rpm -q rpmfusion-nonfree-release-tainted &>/dev/null; then
+        info "Menginstall RPM Fusion Tainted..."
+        sudo dnf install -y rpmfusion-free-release-tainted rpmfusion-nonfree-release-tainted >/dev/null 2>&1 || true
+    fi
+
+    # 3. Flathub remote
+    if command -v flatpak &>/dev/null; then
+        if ! flatpak remotes 2>/dev/null | grep -q "flathub"; then
+            info "Menambahkan remote Flathub..."
+            sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo >/dev/null 2>&1 || true
+        fi
+    fi
 }
 
 ensure_gum_installed

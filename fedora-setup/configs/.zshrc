@@ -43,6 +43,22 @@ alias dnfup='sudo dnf upgrade --refresh'
 alias dco='docker compose'
 alias ff='fastfetch'
 
+# ASUS ROG / TUF & GPU Quick Controls
+if command -v asusctl >/dev/null 2>&1; then
+    alias asus-bat='asusctl battery info'
+    alias asus-prof='asusctl profile get'
+    alias asus-quiet='asusctl profile set Quiet'
+    alias asus-bal='asusctl profile set Balanced'
+    alias asus-perf='asusctl profile set Performance'
+fi
+
+if command -v supergfxctl >/dev/null 2>&1; then
+    alias gpu-status='supergfxctl -g'
+    alias gpu-hybrid='supergfxctl -m Hybrid'
+    alias gpu-igpu='supergfxctl -m Integrated'
+    alias gpu-dgpu='supergfxctl -m AsusMuxDgpu'
+fi
+
 # Aliases for eza
 if command -v eza >/dev/null 2>&1; then
     alias ls='eza --icons --group-directories-first'

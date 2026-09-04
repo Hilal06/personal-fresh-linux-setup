@@ -29,6 +29,24 @@ bat
 jq
 curl
 Google Antigravity CLI
+Google Antigravity IDE
 Tabnine
 Logseq
 LocalSend
+FiraCode Nerd Font
+asusctl
+rog-control-center
+supergfxctl
+ONLYOFFICE Desktop Editors
+btrfs-assistant
+snapper
+thermald
+tuned
+preload
+Spotube
+VLC Media Player
+Pika Backup
+BleachBit
+EasyEffects
+Flatseal
+Thunderbird Mail ESR

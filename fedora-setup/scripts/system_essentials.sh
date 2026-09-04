@@ -9,7 +9,10 @@ CHOICES=$(gum choose --no-limit \
     "Multimedia Codecs Lengkap (FFmpeg, GStreamer, libdvdcss, Audio/Video Extras)" \
     "Hardware Video Acceleration / Drivers (VA-API, Mesa Freeworld, Intel/AMD)" \
     "System Utilities & Compression (p7zip, unrar, tar, rsync, lshw, pciutils)" \
-    "KDE Plasma Enhancements (KDE Connect, Flatpak KCM integration)")
+    "KDE Plasma Enhancements (KDE Connect, Flatpak KCM integration)" \
+    "Btrfs Assistant & Snapper (GUI Snapshot, Maintenance, Subvolume Management)" \
+    "System Performance & Thermal Tuning (thermald, tuned, preload)" \
+    "Kernel & Sysctl Desktop Tuning (ZRAM Swappiness, File Watcher Handles)")
 
 if [ -z "$CHOICES" ]; then
     info "Tidak ada opsi System Essentials yang dipilih."
@@ -79,6 +82,46 @@ for choice in "${SELECTED_OPTS[@]}"; do
                     kcm-flatpak \
                     plasma-discover-flatpak-backend || true
             success "KDE Plasma Enhancements berhasil diinstall."
+            ;;
+        "Btrfs Assistant & Snapper"*)
+            info "Menginstall Btrfs Assistant, Snapper, dan Btrfs Maintenance..."
+            gum spin --spinner dot --title "Menginstall btrfs-assistant, snapper, btrfsmaintenance..." -- \
+                sudo dnf install -y btrfs-assistant snapper btrfsmaintenance btrfs-progs
+            
+            # Setup konfigurasi snapper default untuk root jika belum ada
+            if ! sudo snapper list-configs 2>/dev/null | grep -q "root"; then
+                info "Membuat konfigurasi snapper awal untuk root (/)...."
+                sudo snapper -c root create-config / || warn "Snapper root config sudah ada atau gagal dibuat."
+            fi
+
+            # Aktifkan service & timer snapper
+            sudo systemctl enable --now snapper-timeline.timer snapper-cleanup.timer 2>/dev/null || true
+            success "Btrfs Assistant & Snapper berhasil dikonfigurasi."
+            ;;
+        "System Performance & Thermal Tuning"*)
+            info "Menginstall & mengaktifkan thermal and performance daemons..."
+            gum spin --spinner dot --title "Menginstall thermald, tuned, preload..." -- \
+                sudo dnf install -y thermald tuned tuned-ppd preload
+            
+            info "Mengaktifkan service thermald, tuned, dan preload..."
+            sudo systemctl enable --now thermald tuned preload 2>/dev/null || true
+            success "System Performance & Thermal Tuning berhasil dikonfigurasi."
+            ;;
+        "Kernel & Sysctl Desktop Tuning"*)
+            info "Menerapkan konfigurasi kernel sysctl untuk ZRAM & responsivitas desktop..."
+            local SYSCTL_CONF="/etc/sysctl.d/99-desktop-tuning.conf"
+            sudo tee "$SYSCTL_CONF" >/dev/null << 'SYSCTL_EOF'
+# Optimasi Desktop, ZRAM, dan File Watcher Handles
+# Meningkatkan efisiensi kompresi memori ZRAM
+vm.swappiness = 180
+vm.vfs_cache_pressure = 50
+
+# Meningkatkan batas inotify handles (krusial untuk Node.js, VSCode, Docker, & IDE)
+fs.inotify.max_user_watches = 524288
+fs.inotify.max_user_instances = 1024
+SYSCTL_EOF
+            sudo sysctl --system >/dev/null 2>&1 || true
+            success "Konfigurasi kernel sysctl ($SYSCTL_CONF) berhasil diterapkan."
             ;;
     esac
 done

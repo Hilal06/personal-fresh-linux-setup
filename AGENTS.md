@@ -28,3 +28,7 @@ Always check for available package managers before executing installation comman
 ### 3. Modularity & Organization
 * Keep individual setup domains organized (e.g. terminal setup, development tools, GUI applications).
 * Maintain sync with [software-development-list.txt](file:///home/faulfedora/Documents/Script/personal-fresh-linux-setup/fedora-setup/docs/software-development-list.txt) when adding or modifying installation modules.
+
+### 4. Automatic Documentation Sync & Secret Safety
+* **Software List & README Sync**: Whenever a new package or application is added to `rpm_apps.sh`, `flatpak_apps.sh`, or `system_essentials.sh`, always update `fedora-setup/docs/software-development-list.txt` and `fedora-setup/README.md`.
+* **Zero Secret Leakage**: Never track or commit secret tokens, `.env`, `.backup`, or generated private keys (`.ssh/id_ed25519`). Always ensure `.gitignore` covers them.

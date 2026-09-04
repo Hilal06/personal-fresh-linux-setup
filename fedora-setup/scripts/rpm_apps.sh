@@ -7,10 +7,15 @@ info "Pilih aplikasi berbasis RPM (DNF) yang ingin diinstall (Spasi untuk memili
 
 CHOICES=$(gum choose --no-limit \
     "Development Tools (gcc, make, git, curl, wget, cmake)" \
+    "Google Antigravity CLI (agy)" \
+    "Google Antigravity IDE (Desktop Application)" \
     "Visual Studio Code" \
     "Docker Engine & Docker Compose" \
     "Fastfetch & Neovim" \
-    "HTop & BTop")
+    "HTop & BTop" \
+    "BleachBit (System Cleaner)" \
+    "EasyEffects & Plugins (Audio Enhancer / Equalizer)" \
+    "Flatseal (Flatpak Permissions Manager)")
 
 if [ -z "$CHOICES" ]; then
     info "Tidak ada aplikasi RPM yang dipilih."
@@ -25,6 +30,49 @@ for choice in "${SELECTED_APPS[@]}"; do
         "Development Tools"*)
             info "Menginstall Development Tools..."
             sudo dnf install -y gcc gcc-c++ make git curl wget cmake
+            ;;
+        "Google Antigravity CLI (agy)")
+            info "Menginstall Google Antigravity CLI (agy)..."
+            mkdir -p "$HOME/.local/bin"
+            if command -v agy &>/dev/null; then
+                success "Antigravity CLI (agy) sudah terinstall di: $(which agy)"
+            else
+                info "Mengunduh binary resmi Google Antigravity CLI..."
+                curl -fsSL https://antigravity.google/install.sh | bash || {
+                    warn "Pemasangan via install.sh resmi selesai atau memerlukan konfirmasi manual."
+                }
+                success "Setup Google Antigravity CLI selesai. Pastikan ~/.local/bin berada di PATH."
+            fi
+            ;;
+        "Google Antigravity IDE (Desktop Application)")
+            info "Menyiapkan Google Antigravity IDE..."
+            if [ -x "/opt/antigravity/antigravity" ] || command -v antigravity &>/dev/null; then
+                success "Google Antigravity IDE sudah terpasang di sistem (/opt/antigravity/antigravity)."
+            else
+                info "Mengunduh dan mengonfigurasi installer resmi Antigravity IDE..."
+                curl -fsSL https://antigravity.google/download/linux -o /tmp/antigravity.tar.gz 2>/dev/null || true
+                if [ -s /tmp/antigravity.tar.gz ]; then
+                    sudo mkdir -p /opt/antigravity
+                    sudo tar -xzf /tmp/antigravity.tar.gz -C /opt/antigravity --strip-components=1 || true
+                    sudo ln -sf /opt/antigravity/antigravity /usr/local/bin/antigravity
+                    rm -f /tmp/antigravity.tar.gz
+                fi
+                # Buat desktop shortcut jika belum ada
+                if [ ! -f /usr/share/applications/antigravity.desktop ] && [ -f /opt/antigravity/antigravity ]; then
+                    sudo tee /usr/share/applications/antigravity.desktop >/dev/null << 'DESKTOP_EOF'
+[Desktop Entry]
+Name=Antigravity
+Comment=Antigravity 2.0
+Exec=/opt/antigravity/antigravity %U
+Icon=/opt/antigravity/icon.png
+Terminal=false
+Type=Application
+Categories=Development;IDE;
+StartupWMClass=antigravity
+DESKTOP_EOF
+                fi
+                success "Google Antigravity IDE berhasil dikonfigurasi."
+            fi
             ;;
         "Visual Studio Code")
             info "Menginstall Visual Studio Code..."
@@ -49,6 +97,18 @@ for choice in "${SELECTED_APPS[@]}"; do
         "HTop & BTop")
             info "Menginstall HTop & BTop..."
             sudo dnf install -y htop btop
+            ;;
+        "BleachBit (System Cleaner)")
+            info "Menginstall BleachBit..."
+            sudo dnf install -y bleachbit
+            ;;
+        "EasyEffects & Plugins (Audio Enhancer / Equalizer)")
+            info "Menginstall EasyEffects dan audio plugins (LSP, Calf)..."
+            sudo dnf install -y easyeffects lsp-plugins-lv2 lv2-calf-plugins
+            ;;
+        "Flatseal (Flatpak Permissions Manager)")
+            info "Menginstall Flatseal..."
+            sudo dnf install -y flatseal || sudo flatpak install -y flathub com.github.tchx84.Flatseal
             ;;
     esac
 done
