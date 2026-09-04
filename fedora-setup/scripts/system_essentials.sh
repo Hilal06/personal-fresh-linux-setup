@@ -109,7 +109,7 @@ for choice in "${SELECTED_OPTS[@]}"; do
             ;;
         "Kernel & Sysctl Desktop Tuning"*)
             info "Menerapkan konfigurasi kernel sysctl untuk ZRAM & responsivitas desktop..."
-            local SYSCTL_CONF="/etc/sysctl.d/99-desktop-tuning.conf"
+            SYSCTL_CONF="/etc/sysctl.d/99-desktop-tuning.conf"
             sudo tee "$SYSCTL_CONF" >/dev/null << 'SYSCTL_EOF'
 # Optimasi Desktop, ZRAM, dan File Watcher Handles
 # Meningkatkan efisiensi kompresi memori ZRAM

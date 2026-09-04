@@ -42,13 +42,14 @@ for task in "${SELECTED_TASKS[@]}"; do
             info "--- [Kesehatan Baterai & Daya] ---"
             if command -v asusctl &>/dev/null; then
                 asusctl battery info 2>/dev/null || true
-                local PROF
                 PROF="$(asusctl profile get 2>/dev/null || echo 'Unknown')"
                 echo "Profile Daya ASUS: $PROF"
             fi
-            if [ -f /sys/class/power_supply/BAT*/capacity ]; then
-                echo "Kapasitas Baterai: $(cat /sys/class/power_supply/BAT*/capacity 2>/dev/null)%"
-            fi
+            for bat_cap in /sys/class/power_supply/BAT*/capacity; do
+                if [ -f "$bat_cap" ]; then
+                    echo "Kapasitas Baterai ($(basename "$(dirname "$bat_cap")")): $(cat "$bat_cap" 2>/dev/null)%"
+                fi
+            done
 
             # 2. Status GPU (Mux / Hybrid)
             echo ""
@@ -60,7 +61,7 @@ for task in "${SELECTED_TASKS[@]}"; do
             # 3. Status Service Esensial
             echo ""
             info "--- [Status Background Services] ---"
-            local SERVICES=("asusd.service" "supergfxd.service" "thermald.service" "tuned.service" "preload.service")
+            SERVICES=("asusd.service" "supergfxd.service" "thermald.service" "tuned.service" "preload.service")
             for s in "${SERVICES[@]}"; do
                 if systemctl is-active --quiet "$s"; then
                     echo -e "  [+] $s : \033[0;32mRUNNING\033[0m"
@@ -119,7 +120,7 @@ for task in "${SELECTED_TASKS[@]}"; do
         "Restore Dotfiles dari Backup Terbaru"*)
             echo ""
             gum style --foreground 99 --bold ">>> Restore Dotfiles dari Backup..."
-            local BACKUP_DIR="$HOME/.dotfiles_backup"
+            BACKUP_DIR="$HOME/.dotfiles_backup"
             
             if [ ! -d "$BACKUP_DIR" ]; then
                 warn "Direktori backup $BACKUP_DIR tidak ditemukan."
@@ -129,7 +130,7 @@ for task in "${SELECTED_TASKS[@]}"; do
             if [ -f "$BACKUP_DIR/.zshrc.latest" ]; then
                 if gum confirm "Restore ~/.zshrc dari backup terakhir ($BACKUP_DIR/.zshrc.latest)?"; then
                     cp "$BACKUP_DIR/.zshrc.latest" "$HOME/.zshrc"
-                    success "~/.zshrc berhasil di-restore."
+                    success "$HOME/.zshrc berhasil di-restore."
                 fi
             else
                 info "Tidak ada backup .zshrc.latest."
@@ -139,7 +140,7 @@ for task in "${SELECTED_TASKS[@]}"; do
                 if gum confirm "Restore ~/.config/starship.toml dari backup terakhir?"; then
                     mkdir -p "$HOME/.config"
                     cp "$BACKUP_DIR/starship.toml.latest" "$HOME/.config/starship.toml"
-                    success "~/.config/starship.toml berhasil di-restore."
+                    success "$HOME/.config/starship.toml berhasil di-restore."
                 fi
             else
                 info "Tidak ada backup starship.toml.latest."
