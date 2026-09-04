@@ -59,6 +59,9 @@ if command -v supergfxctl >/dev/null 2>&1; then
     alias gpu-dgpu='supergfxctl -m AsusMuxDgpu'
 fi
 
+# Project Git Sync & Changelog Helper
+alias gsync='$HOME/Documents/Script/personal-fresh-linux-setup/scripts/git-sync.sh'
+
 # Aliases for eza
 if command -v eza >/dev/null 2>&1; then
     alias ls='eza --icons --group-directories-first'
