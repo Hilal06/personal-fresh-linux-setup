@@ -3,6 +3,12 @@ set -e
 
 source "$(dirname "$0")/env.sh"
 
+echo ""
+gum style \
+    --foreground 141 --border-foreground 141 --border rounded \
+    --align center --width 64 --padding "1 2" --bold \
+    "SYSTEM ESSENTIALS & CODECS" "Multimedia, Btrfs Snapshots & Desktop Optimization"
+
 info "Pilih modul System Essentials & Media Codecs yang ingin diinstall (Spasi untuk memilih, Enter untuk konfirmasi):"
 
 CHOICES=$(gum choose --no-limit \

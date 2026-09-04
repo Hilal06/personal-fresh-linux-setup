@@ -3,6 +3,12 @@ set -e
 
 source "$(dirname "$0")/env.sh"
 
+echo ""
+gum style \
+    --foreground 69 --border-foreground 69 --border rounded \
+    --align center --width 64 --padding "1 2" --bold \
+    "FLATHUB APPLICATION STORE" "Sandboxed Desktop Applications & Productivity"
+
 info "Pilih aplikasi berbasis Flatpak (Flathub) yang ingin diinstall (Spasi untuk memilih, Enter untuk konfirmasi):"
 
 CHOICES=$(gum choose --no-limit \

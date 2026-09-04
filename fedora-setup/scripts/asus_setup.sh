@@ -10,6 +10,12 @@ set -e
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 source "$SCRIPT_DIR/env.sh"
 
+echo ""
+gum style \
+    --foreground 196 --border-foreground 196 --border rounded \
+    --align center --width 64 --padding "1 2" --bold \
+    "ROG & TUF GAMING UTILITY" "ASUS Power, GPU MUX Switch & Battery Care"
+
 info "Memulai setup dan konfigurasi utilitas ASUS ROG / TUF..."
 
 # 1. Deteksi Perangkat ASUS

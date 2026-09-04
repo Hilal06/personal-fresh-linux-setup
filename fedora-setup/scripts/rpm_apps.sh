@@ -3,6 +3,12 @@ set -e
 
 source "$(dirname "$0")/env.sh"
 
+echo ""
+gum style \
+    --foreground 33 --border-foreground 33 --border rounded \
+    --align center --width 64 --padding "1 2" --bold \
+    "RPM APPLICATION REPOSITORY" "DNF, Developer Tools, Antigravity & System Utilities"
+
 info "Pilih aplikasi berbasis RPM (DNF) yang ingin diinstall (Spasi untuk memilih, Enter untuk konfirmasi):"
 
 CHOICES=$(gum choose --no-limit \

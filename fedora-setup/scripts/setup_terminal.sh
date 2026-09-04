@@ -12,6 +12,12 @@ CONFIGS_DIR="$SCRIPT_DIR/../configs"
 # Load environment & helper functions (info, success, warn, error, gum)
 source "$SCRIPT_DIR/env.sh"
 
+echo ""
+gum style \
+    --foreground 45 --border-foreground 45 --border rounded \
+    --align center --width 64 --padding "1 2" --bold \
+    "TERMINAL & SHELL WORKSPACE" "Zsh, Starship, FiraCode Nerd Font & Dotfiles"
+
 info "Memulai setup dan konfigurasi terminal modern..."
 
 # 1. Install CLI Tools & Starship

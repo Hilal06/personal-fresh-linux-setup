@@ -15,10 +15,18 @@ sudo -v
 # 2. Bersihkan terminal dan tampilkan Header TUI langsung di awal
 clear
 
+BIGTEXT_FILE="$SCRIPT_DIR/configs/bigtext.txt"
+[ ! -f "$BIGTEXT_FILE" ] && BIGTEXT_FILE="$SCRIPT_DIR/../bigtext"
+
+if [ -f "$BIGTEXT_FILE" ]; then
+    echo ""
+    gum style --foreground 39 --bold --align center "$(< "$BIGTEXT_FILE")"
+fi
+
 gum style \
-	--foreground 212 --border-foreground 212 --border double \
-	--align center --width 60 --margin "1 2" --padding "1 4" \
-	"FEDORA KDE 44 SETUP" "Personal System Setup & Automation"
+	--foreground 212 --border-foreground 212 --border rounded \
+	--align center --width 64 --margin "0 2 1 2" --padding "1 2" --bold \
+	"Fresh Fedora KDE Utillity" "Personal System Setup & Automation Suite"
 
 # 3. Setup repository environment menggunakan spinner TUI (cepat & non-blocking)
 gum spin --spinner dot --title "Menyiapkan konfigurasi DNF, RPM Fusion & Flathub..." -- bash -c "source '$SCRIPT_DIR/scripts/env.sh' && setup_environment_repos"
@@ -82,5 +90,5 @@ done
 echo ""
 gum style \
 	--foreground 82 --border-foreground 82 --border rounded \
-	--align center --width 60 --padding "1 2" \
-	"SETUP SELESAI!" "Semua tugas yang dipilih berhasil dikonfigurasi."
+	--align center --width 64 --padding "1 2" --bold \
+	"🎉 SETUP SELESAI!" "Semua konfigurasi Fresh Fedora KDE Utillity berhasil diterapkan."
