@@ -49,14 +49,13 @@ fedora-setup/
 - **Koneksi Internet**: Diperlukan untuk mengunduh package
 - **Hak Akses Sudo**: Pengguna saat ini harus memiliki hak eksekusi `sudo`
 
-## ⚡ Instalasi Cepat (One-Liner)
+## ⚡ Instalasi Cepat (One-Liner Tanpa Manual Clone)
 
-Jalankan perintah berikut di terminal Anda untuk mengunduh dan mengeksekusi skrip utama secara langsung:
+Jalankan perintah berikut di terminal Anda untuk mengeksekusi utilitas secara instan:
 
 ```bash
-git clone https://github.com/USERNAME/REPO_NAME.git && cd REPO_NAME/fedora-setup && chmod +x setup.sh && ./setup.sh
+curl -fsSL https://raw.githubusercontent.com/Hilal06/personal-fresh-linux-setup/main/install.sh | bash
 ```
-*(Catatan: Ganti `USERNAME/REPO_NAME` dengan tautan repositori GitHub Anda)*
 
 ## 📝 Cara Menambahkan Aplikasi Baru
 Skrip ini dirancang secara modular. Untuk menambahkan aplikasi:

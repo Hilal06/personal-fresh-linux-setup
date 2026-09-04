@@ -4,6 +4,15 @@ Dokumentasi riwayat pembaruan dan otomasi commit proyek `personal-fresh-linux-se
 
 ---
 
+### 🚀 [2026-09-04 14:24:36] - feat: add one-liner web installer (install.sh) for instant curl execution
+
+- **Author**: Rifaul <rifaulhilal06@gmail.com>
+- **Branch**: main
+- **Files Changed**:
+  -  M README.md
+  -  M fedora-setup/README.md
+  - ?? install.sh
+
 ### 🚀 [2026-09-04 14:22:01] - docs: update README.md with centered bigtext banner frame and bigtext.txt config
 
 - **Author**: Rifaul <rifaulhilal06@gmail.com>

@@ -92,13 +92,15 @@ personal-fresh-linux-setup/
 
 ---
 
-## ⚡ Instalasi Cepat (One-Liner)
+## ⚡ Instalasi Cepat (One-Liner Tanpa Manual Clone)
 
-Jalankan perintah berikut di terminal Anda:
+Sama seperti tool otomasi modern di Windows (seperti Chris Titus Tech WinUtil `irm ... | iex`), Anda dapat langsung menjalankan utilitas ini di mesin Fedora baru **hanya dengan satu baris perintah** tanpa perlu clone manual:
 
 ```bash
-git clone https://github.com/Hilal06/personal-fresh-linux-setup.git && cd personal-fresh-linux-setup/fedora-setup && chmod +x setup.sh && ./setup.sh
+curl -fsSL https://raw.githubusercontent.com/Hilal06/personal-fresh-linux-setup/main/install.sh | bash
 ```
+
+*(Installer web ini akan otomatis menyiapkan lingkungan yang dibutuhkan di latar belakang dan langsung membuka antarmuka TUI interaktif).*
 
 ---
 
