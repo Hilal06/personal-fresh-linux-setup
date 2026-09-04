@@ -38,7 +38,8 @@ fedora-setup/
 │   └── flatpak_apps.sh      # Menu TUI instalasi aplikasi via Flatpak
 ├── configs/
 │   ├── .zshrc               # Dotfiles konfigurasi Zsh
-│   └── starship.toml        # Konfigurasi tema & prompt Starship
+│   ├── starship.toml        # Konfigurasi tema & prompt Starship
+│   └── bigtext.txt          # ASCII Art Banner Header
 └── docs/
     └── software-development-list.txt # Daftar referensi software & tools
 ```

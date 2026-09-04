@@ -20,10 +20,15 @@
 ## 🌌 Fitur Unggulan (Highlights)
 
 ```text
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                             FEDORA KDE 44 SETUP                             │
-│                      Personal System Setup & Automation                     │
-└─────────────────────────────────────────────────────────────────────────────┘
+╭────────────────────────────────────────────────────────────────╮
+│                                                                │
+│                   █░█ █ █░░ ▄▀█ █░░ █▀█ █▄▄                    │
+│                   █▀█ █ █▄▄ █▀█ █▄▄ █▄█ █▄█                    │
+│                                                                │
+│                   Fresh Fedora KDE Utillity                    │
+│            Personal System Setup & Automation Suite            │
+│                                                                │
+╰────────────────────────────────────────────────────────────────╯
   [x] Setup Shell & Terminal (Zsh, Starship, FiraCode & Konsole Font)
   [x] Install System Essentials (Codecs, VA-API, Btrfs Assistant & Sysctl Tuning)
   [x] Install Aplikasi RPM (VSCode, Docker, Antigravity CLI/IDE, EasyEffects)
@@ -72,7 +77,8 @@ personal-fresh-linux-setup/
 │   │   └── flatpak_apps.sh      # Menu seleksi aplikasi Flatpak (ONLYOFFICE, Spotube)
 │   ├── configs/
 │   │   ├── .zshrc               # Konfigurasi Zsh + Pintasan kontrol ASUS/GPU
-│   │   └── starship.toml        # Tema dan prompt Starship
+│   │   ├── starship.toml        # Tema dan prompt Starship
+│   │   └── bigtext.txt          # ASCII Art Banner Header
 │   └── docs/
 │       └── software-development-list.txt # Daftar inventaris software sistem
 ├── scripts/
