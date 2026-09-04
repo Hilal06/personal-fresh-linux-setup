@@ -50,3 +50,4 @@ BleachBit
 EasyEffects
 Flatseal
 Thunderbird Mail ESR
+BTop

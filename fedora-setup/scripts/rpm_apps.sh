@@ -18,7 +18,7 @@ CHOICES=$(gum choose --no-limit \
     "Visual Studio Code" \
     "Docker Engine & Docker Compose" \
     "Fastfetch & Neovim" \
-    "HTop & BTop" \
+    "BTop (Modern Resource Monitor)" \
     "BleachBit (System Cleaner)" \
     "EasyEffects & Plugins (Audio Enhancer / Equalizer)" \
     "Flatseal (Flatpak Permissions Manager)")
@@ -100,9 +100,9 @@ DESKTOP_EOF
             info "Menginstall Fastfetch & Neovim..."
             sudo dnf install -y fastfetch neovim
             ;;
-        "HTop & BTop")
-            info "Menginstall HTop & BTop..."
-            sudo dnf install -y htop btop
+        "BTop"*)
+            info "Menginstall BTop..."
+            sudo dnf install -y btop
             ;;
         "BleachBit (System Cleaner)")
             info "Menginstall BleachBit..."

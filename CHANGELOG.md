@@ -4,6 +4,15 @@ Dokumentasi riwayat pembaruan dan otomasi commit proyek `personal-fresh-linux-se
 
 ---
 
+### 🚀 [2026-09-04 14:48:11] - feat: add post-install cleanup prompt and replace HTOP with BTOP only
+
+- **Author**: Rifaul <rifaulhilal06@gmail.com>
+- **Branch**: main
+- **Files Changed**:
+  -  M fedora-setup/docs/software-development-list.txt
+  -  M fedora-setup/scripts/rpm_apps.sh
+  -  M install.sh
+
 ### 🚀 [2026-09-04 14:24:36] - feat: add one-liner web installer (install.sh) for instant curl execution
 
 - **Author**: Rifaul <rifaulhilal06@gmail.com>
