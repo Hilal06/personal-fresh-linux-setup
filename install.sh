@@ -1,20 +1,39 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Fresh Fedora KDE Utillity - One-Liner Web Installer
+# Fresh Linux Setup Utility - One-Liner Web Installer
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/Hilal06/personal-fresh-linux-setup/main/install.sh | bash
 # ==============================================================================
 
 set -e
 
+# Fallback untuk environment root / container minimal tanpa command sudo
+if ! command -v sudo &>/dev/null && [ "${EUID:-$(id -u)}" -eq 0 ]; then
+    sudo() { "$@"; }
+fi
+
 REPO_URL="https://github.com/Hilal06/personal-fresh-linux-setup.git"
 TARBALL_URL="https://github.com/Hilal06/personal-fresh-linux-setup/archive/refs/heads/main.tar.gz"
 INSTALL_DIR="$HOME/.local/share/personal-fresh-linux-setup"
 
-# 1. Pastikan curl dan tar atau git terpasang
-if ! command -v git &>/dev/null && ! command -v curl &>/dev/null; then
-    echo "[INFO] Menyiapkan curl & git..."
-    sudo dnf install -y git curl tar >/dev/null 2>&1 || true
+# 1. Verifikasi kompatibilitas sistem & pastikan curl/tar/git terpasang
+if command -v pacman &>/dev/null; then
+    echo -e "\033[0;31m[ERROR] Distribusi Arch Linux (pacman) tidak didukung.\033[0m"
+    echo "Utilitas ini khusus dirancang untuk Fedora Workstation dan Ubuntu (KDE / GNOME)."
+    exit 1
+fi
+
+if ! command -v git &>/dev/null || ! command -v curl &>/dev/null || ! command -v tar &>/dev/null; then
+    echo "[INFO] Menyiapkan paket dependensi awal (git, curl, tar)..."
+    if command -v dnf &>/dev/null; then
+        sudo dnf install -y git curl tar >/dev/null 2>&1 || true
+    elif command -v apt-get &>/dev/null; then
+        sudo apt-get update -qq >/dev/null 2>&1 || true
+        sudo apt-get install -y git curl tar >/dev/null 2>&1 || true
+    else
+        echo -e "\033[0;31m[ERROR] Package manager tidak didukung. Utilitas ini hanya mendukung Fedora dan Ubuntu.\033[0m"
+        exit 1
+    fi
 fi
 
 # 2. Unduh atau perbarui repositori ke direktori lokal tersembunyi
@@ -24,7 +43,7 @@ if [ -d "$INSTALL_DIR/.git" ]; then
 else
     mkdir -p "$INSTALL_DIR"
     if command -v git &>/dev/null; then
-        echo "[INFO] Mengunduh Fresh Fedora KDE Utillity..."
+        echo "[INFO] Mengunduh Fresh Linux Setup Utility..."
         git clone --depth 1 "$REPO_URL" "$INSTALL_DIR" --quiet
     else
         echo "[INFO] Mengunduh archive utilitas via curl..."

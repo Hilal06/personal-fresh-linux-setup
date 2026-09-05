@@ -14,7 +14,7 @@ This skill provides procedures for maintaining and extending the automation scri
 
 1. **Adding New Packages/Tools**:
    - Check [software-development-list.txt](file:///home/faulfedora/Documents/Script/personal-fresh-linux-setup/software-development-list.txt) to see if the tool is listed or needs to be added.
-   - Implement package manager installation logic covering Fedora (`dnf`), Ubuntu/Debian (`apt`), and Arch (`pacman`).
+   - Implement package manager installation logic covering Fedora (`dnf`) and Ubuntu (`apt`). Arch (`pacman`) is strictly unsupported.
    - If a package requires external repos or binary downloads (like Starship or eza on older distros), provide reliable curl/script/binary fallback.
 
 2. **Validating Scripts**:

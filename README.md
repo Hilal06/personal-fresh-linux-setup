@@ -3,21 +3,23 @@
 # ⚡ Personal Fresh Linux Setup
 ### Modern, Modular & Aesthetic Post-Installation Automation Suite
 
-[![Fedora 44](https://img.shields.io/badge/Fedora-44%20KDE%20Plasma-blue?style=for-the-badge&logo=fedora&logoColor=white)](https://fedoraproject.org/)
-[![Zsh & Starship](https://img.shields.io/badge/Shell-Zsh%20%2B%20Starship-orange?style=for-the-badge&logo=gnu-bash&logoColor=white)](https://starship.rs/)
-[![ASUS ROG & TUF](https://img.shields.io/badge/Hardware-ASUS%20ROG%20%2F%20TUF-red?style=for-the-badge&logo=asus&logoColor=white)](https://asus-linux.org/)
-[![Charm Gum TUI](https://img.shields.io/badge/Interface-Charm%20Gum%20TUI-pink?style=for-the-badge&logo=terminal&logoColor=white)](https://github.com/charmbracelet/gum)
+[![Fedora Workstation](https://img.shields.io/badge/Fedora-Workstation%20%2F%20KDE-blue?style=for-the-badge&logo=fedora&logoColor=white)](https://fedoraproject.org/)
+[![Ubuntu](https://img.shields.io/badge/Ubuntu-KDE%20%2F%20GNOME-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
+[![Arch Linux](https://img.shields.io/badge/Arch%20Linux-Unsupported%20%2F%20Blocked-lightgrey?style=for-the-badge&logo=archlinux&logoColor=grey)](https://archlinux.org/)
+[![Shell](https://img.shields.io/badge/Shell-Zsh%20%2B%20Starship-orange?style=for-the-badge&logo=gnu-bash&logoColor=white)](https://starship.rs/)
+[![CI / CD](https://img.shields.io/badge/CI%2FCD-Multi--Distro%20Tested-green?style=for-the-badge&logo=githubactions&logoColor=white)](.github/workflows/ci.yml)
+[![Interface](https://img.shields.io/badge/TUI-Charm%20Gum-pink?style=for-the-badge&logo=terminal&logoColor=white)](https://github.com/charmbracelet/gum)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
 <p align="center">
-  <b>Automasi bootstrap sistem Linux modular berorientasi developer dengan TUI interaktif, akselerasi hardware penuh, optimasi ZRAM & DNF, integrasi hardware ASUS ROG/TUF, dan lingkungan terminal modern.</b>
+  <b>Otomasi bootstrap sistem Linux modular berorientasi developer untuk Fedora Workstation dan Ubuntu (KDE / GNOME) dengan antarmuka TUI interaktif, akselerasi hardware, integrasi hardware ASUS ROG/TUF, dotfiles rollback instan, dan lingkungan terminal modern.</b>
 </p>
 
 ---
 
 </div>
 
-## 🌌 Fitur Unggulan (Highlights)
+## 🌌 Antarmuka Terminal & Menu Interaktif (TUI)
 
 ```text
 ╭────────────────────────────────────────────────────────────────╮
@@ -25,38 +27,129 @@
 │                   █░█ █ █░░ ▄▀█ █░░ █▀█ █▄▄                    │
 │                   █▀█ █ █▄▄ █▀█ █▄▄ █▄█ █▄█                    │
 │                                                                │
-│                   Fresh Fedora KDE Utillity                    │
+│                   Fresh Linux Setup Utility                    │
 │            Personal System Setup & Automation Suite            │
 │                                                                │
 ╰────────────────────────────────────────────────────────────────╯
-  [x] Setup Shell & Terminal (Zsh, Starship, FiraCode & Konsole Font)
-  [x] Install System Essentials (Codecs, VA-API, Btrfs Assistant & Sysctl Tuning)
-  [x] Install Aplikasi RPM (VSCode, Docker, Antigravity CLI/IDE, EasyEffects)
-  [x] Install Aplikasi Flatpak (ONLYOFFICE, Spotube, Discord, Pika Backup)
+  [x] Setup Shell & Terminal (Zsh, Starship, FiraCode, Konsole & GNOME Font)
+  [x] Install System Essentials & Media Codecs (FFmpeg, VA-API, Btrfs & Sysctl)
+  [x] Install Native Apps (VSCode, Docker Engine, Antigravity CLI/IDE, Neovim)
+  [x] Install Sandboxed Apps (ONLYOFFICE, Spotube, Discord, Pika Backup)
   [x] Setup & Konfigurasi ASUS ROG / TUF Utilities (Battery 80%, GPU Switch)
-  [x] System Maintenance & Health Check (Hardware status & clean rollback)
+  [x] Setup Identitas Git & SSH Key Developer (ed25519 & Clipboard Integration)
+  [x] System Maintenance & Health Check (Timestamped Dotfiles Rollback & Cache Clean)
 ```
 
-- 🎨 **Interaktif Terminal UI**: Menu multi-select modern bertenaga [Charmbracelet Gum](https://github.com/charmbracelet/gum).
-- ⚡ **Optimasi Kecepatan DNF**: Otomatis menyuntikkan `max_parallel_downloads=10`, `fastestmirror=True`, dan `defaultyes=True`.
-- ⌨️ **Terminal Modern & Font Otomatis**:
-  - Zsh dengan `zsh-autosuggestions`, `zsh-syntax-highlighting`, autocompletions, dan prompt [Starship](https://starship.rs/).
-  - Deteksi dan instalasi otomatis **FiraCode Nerd Font** resmi dari GitHub.
-  - Skrip otomatis mengonfigurasi profil **KDE Konsole** agar langsung mengenali font dan ikon ligatur.
-- 💻 **Integrasi Penuh ASUS ROG & TUF Gaming**:
-  - Konfigurasi `asusctl`, `rog-control-center`, dan `supergfxctl`.
-  - Pembatasan pengisian baterai **80% Battery Health Care**.
-  - Pintasan GPU Switching (`Hybrid`, `Integrated`, `AsusMuxDgpu`) dan profil kipas (`Quiet`, `Balanced`, `Performance`).
-- 🎛️ **Kernel & Sysctl Desktop Tuning**:
-  - Optimasi memori ZRAM (`vm.swappiness=180` & `vm.vfs_cache_pressure=50`).
-  - Peningkatan file watcher inotify (`524288`) untuk kestabilan Node.js, Docker, dan VSCode/IDE.
-- 🛡️ **Btrfs Assistant & Snapper Snapshot**:
-  - Pembuatan snapshot root (`/`) otomatis dan timer maintenance berkala.
-- 🔄 **Safe Dotfiles Backup & Instant Rollback**:
-  - Backup terpusat ke `~/.dotfiles_backup/` dengan utilitas pemulihan sekali klik.
-- 🚀 **Developer Ready**:
-  - Wizard interaktif Git identity (nama/email) dan generator SSH Key `ed25519` siap pasang ke GitHub.
-  - Pilihan mandiri: Google Antigravity (CLI `agy` & IDE), VSCode, Docker, Podman Desktop, Bruno, DBeaver, dll.
+---
+
+## 📊 Tabel Dukungan Sistem Operasi (Support Matrix)
+
+Skrip dirancang dan dioptimalkan secara spesifik hanya untuk ekosistem **Fedora Workstation** dan **Ubuntu (KDE / GNOME)**. Distribusi berbasis Arch Linux (`pacman`) diblokir secara otomatis demi mencegah ketidakcocokan dependensi.
+
+| Distribusi | Desktop Environment | Status Dukungan | Package Manager | Versi Teruji | Catatan Utama |
+| :--- | :--- | :---: | :---: | :---: | :--- |
+| **Fedora Workstation** | GNOME 47 / 48 | <span style="color:#22c55e">●</span> **Penuh (Tier 1)** | `dnf` | Fedora 40, 41, Rawhide | Optimasi DNF, RPM Fusion Free/NonFree/Tainted, VA-API, Sysctl Tuning |
+| **Fedora KDE Spin** | KDE Plasma 6 | <span style="color:#22c55e">●</span> **Penuh (Tier 1)** | `dnf` | Fedora 40, 41, Rawhide | Auto-konfigurasi font Konsole (`kwriteconfig6`), KCM Flatpak, Discover backend |
+| **Ubuntu Desktop** | GNOME 46 / 47 | <span style="color:#22c55e">●</span> **Penuh (Tier 1)** | `apt` | 24.04 LTS, 22.04 LTS | Auto-konfigurasi font GNOME Terminal (`gsettings`), PPA Fastfetch, eza repo |
+| **Kubuntu / Ubuntu KDE**| KDE Plasma 5.27 / 6 | <span style="color:#22c55e">●</span> **Penuh (Tier 1)** | `apt` | 24.04 LTS, 22.04 LTS | Auto-konfigurasi font Konsole (`kwriteconfig5/6`), KDE Connect integration |
+| **Arch Linux / Manjaro** | Any DE | <span style="color:#ef4444">■</span> **Tidak Didukung** | `pacman` | N/A | Eksekusi diblokir otomatis dengan pesan error peringatan ramah |
+| **Debian / Distro Lain** | Any DE | <span style="color:#eab308">▲</span> **Eksperimental** | `apt` | Sid / Testing | Sebagian modul APT dapat berjalan namun tidak dijamin penuh |
+
+---
+
+## ⚙️ Kebutuhan Sistem Minimum (System Requirements)
+
+| Komponen | Spesifikasi Minimum | Rekomendasi Developer | Alasan & Kebutuhan |
+| :--- | :--- | :--- | :--- |
+| **Arsitektur** | `x86_64` (amd64) | `x86_64` (amd64) | Dukungan biner resmi Starship, VSCode, Docker, dan Flatpak |
+| **Prosesor (CPU)** | Dual-Core 2.0 GHz | Quad-Core 3.0 GHz+ (Intel Core / AMD Ryzen) | Kompilasi package, font rendering, dan container Docker |
+| **Memori (RAM)** | 4 GB | 8 GB – 16 GB+ | Multitasking IDE, Docker containers, dan efisiensi ZRAM |
+| **Penyimpanan (Disk)** | 10 GB ruang kosong | 30 GB+ SSD (NVMe lebih disukai) | Menyimpan aplikasi Flatpak, container images, dan snapshot Btrfs |
+| **Hak Akses** | Akun pengguna biasa | Akun dengan izin `sudo` tanpa password | Menjalankan instalasi paket sistem dan konfigurasi sysctl |
+| **Koneksi Internet** | Broadband stabil (≥ 5 Mbps) | Fiber / High-speed (≥ 25 Mbps) | Mengunduh package RPM/APT, font Nerd Fonts, dan Flatpak runtime |
+| **Terminal Emulator** | Terminal ANSI standar | Konsole (KDE) atau GNOME Terminal | Tampilan Charm Gum TUI, Unicode glyphs, dan warna 24-bit TrueColor |
+
+---
+
+## ⚡ Instalasi Cepat (One-Liner Web Installer)
+
+Jalankan perintah berikut di terminal Anda untuk menjalankan utilitas secara instan **tanpa perlu clone manual**:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Hilal06/personal-fresh-linux-setup/main/install.sh | bash
+```
+
+> [!NOTE]
+> Installer web ini akan memverifikasi kesesuaian distribusi, mengunduh repositori ke direktori aman, menyiapkan dependensi awal (`curl`, `tar`, `git`), dan langsung meluncurkan menu TUI interaktif. Di akhir sesi, Anda akan diberikan opsi untuk membersihkan direktori temporary installer secara otomatis.
+
+### Menjalankan Secara Manual (Local Clone)
+Jika Anda lebih suka mengkloning repositori sendiri:
+
+```bash
+git clone https://github.com/Hilal06/personal-fresh-linux-setup.git
+cd personal-fresh-linux-setup
+./fedora-setup/setup.sh
+```
+
+---
+
+## 🚀 Fitur Unggulan (Core Features)
+
+### 🎨 1. Terminal Modern & Shell Workspace
+- **Zsh & Starship Prompt**: Konfigurasi Zsh modern dengan integrasi tema [Starship](https://starship.rs/).
+- **Plugin Produktivitas**: `zsh-autosuggestions`, `zsh-syntax-highlighting`, dan `zsh-completions` terpasang otomatis.
+- **CLI Modern Tools**: Menggantikan perintah klasik dengan versi modern berkecepatan tinggi:
+  - `eza` (pengganti `ls` dengan glyph dan git status)
+  - `bat` (pengganti `cat` dengan syntax highlighting dan line numbers)
+  - `fd-find` (pengganti `find` berkecepatan tinggi)
+  - `fzf` (fuzzy finder interaktif untuk file dan history navigasi)
+  - `zoxide` (pengganti cerdas `cd` yang mengingat riwayat direktori)
+- **Instalasi FiraCode Nerd Font Otomatis**: Deteksi font sistem dan unduhan langsung versi rilis resmi GitHub.
+- **Auto-Config Font Terminal**: Otomatis menyetel font profil **KDE Konsole** (`kwriteconfig6/5`) dan **GNOME Terminal** (`gsettings`) ke `FiraCode Nerd Font 11` tanpa perlu klik manual.
+
+### 🛠️ 2. Otomasi Identitas Git & SSH Key Developer
+- **Git Identity Wizard**: Konfigurasi global nama (`user.name`), email (`user.email`), dan inisialisasi default branch `main`.
+- **Generator Kunci SSH `ed25519`**: Membuat private & public key dengan enkripsi modern dan hak akses aman (`chmod 700` & `chmod 600`).
+- **Integrasi Clipboard Otomatis**: Mendeteksi display server aktif dan langsung menyalin Public SSH Key ke clipboard:
+  - Wayland: via `wl-copy`
+  - X11: via `xclip`
+- Tampilan Public Key berbingkai rapi dengan tautan langsung ke halaman pengaturan GitHub SSH Keys.
+
+### 🔄 3. Safe Dotfiles Backup & Timestamped Rollback
+- **Pencadangan Otomatis**: Setiap kali dotfiles (`~/.zshrc` dan `~/.config/starship.toml`) diperbarui, versi sebelumnya dicadangkan ke `~/.dotfiles_backup/` dengan format timestamp (`.backup.YYYYMMDDHHMMSS`).
+- **Rollback Interaktif**: Menu pemulihan pada `maintenance.sh` memindai seluruh snapshot backup yang tersedia dan memungkinkan Anda memilih versi spesifik untuk di-restore via Charm Gum.
+- **Safety Pre-Restore Snapshot**: Sebelum menimpa berkas konfigurasi aktif saat proses rollback, sistem membuat safety snapshot cadangan (`.pre_restore.YYYYMMDDHHMMSS`).
+
+### 💻 4. Integrasi Hardware Laptop ASUS ROG / TUF Gaming
+- Otomatis memasang `asusctl`, `rog-control-center`, dan `supergfxctl` (pada Fedora) atau memberikan panduan PPA komunitas resmi (pada Ubuntu).
+- **80% Battery Care**: Mengaktifkan batas pengisian daya untuk memperpanjang usia baterai lithium-ion.
+- **GPU Switching & Fan Profiles**: Menambahkan alias terminal praktis:
+  - `asus-bat`: Cek info dan kesehatan baterai
+  - `asus-quiet`, `asus-bal`, `asus-perf`: Ganti profil kipas dan daya
+  - `gpu-hybrid`, `gpu-igpu`, `gpu-dgpu`: Ganti mode grafis laptop
+
+### 🎛️ 5. Optimasi Sistem & Desktop Tuning
+- **Optimasi Kecepatan DNF**: Otomatis menyuntikkan `max_parallel_downloads=10`, `fastestmirror=True`, dan `defaultyes=True` pada `/etc/dnf/dnf.conf`.
+- **Tuning Kernel Sysctl**:
+  - `vm.swappiness = 180` & `vm.vfs_cache_pressure = 50`: Memaksimalkan efisiensi kompresi memori ZRAM.
+  - `fs.inotify.max_user_watches = 524288`: Mencegah crash file watcher pada Node.js, VSCode, Docker, dan Android Studio.
+- **Btrfs Assistant & Snapper**: Konfigurasi otomatis snapshot sistem root (`/`) dengan timer pembersihan berkala.
+
+### 📦 6. Ekosistem Aplikasi Native & Sandboxed
+- **Aplikasi Native (DNF / APT)**:
+  - Google Antigravity (CLI `agy` & IDE Desktop)
+  - Visual Studio Code (Microsoft Official Repositories)
+  - Docker Engine & Docker Compose (Docker Community Repositories)
+  - Neovim, Fastfetch, Btop, BleachBit, EasyEffects, Flatseal
+- **Aplikasi Sandboxed (Flathub / Flatpak)**:
+  - ONLYOFFICE Desktop Editors, Spotube (Spotify Client), Discord, Thunderbird Mail, VLC, Pika Backup, DBeaver, Bruno API Client, Logseq, LocalSend, Podman Desktop, Arduino IDE.
+
+### 🧪 7. Otomasi Pengujian & CI/CD Pipeline
+- Pipeline GitHub Actions bertenaga container [`.github/workflows/ci.yml`](.github/workflows/ci.yml) yang berjalan pada setiap push & pull request:
+  - **Static Analysis**: ShellCheck memeriksa kepatuhan standar POSIX/Bash.
+  - **Syntax Verification**: Pengujian `bash -n` pada semua berkas skrip.
+  - **Multi-Distro Matrix**: Pengujian nyata di dalam container `fedora:latest` dan `ubuntu:24.04`.
+  - **Arch Rejection Assertion**: Memastikan sistem Arch/pacman ditolak secara elegan tanpa merusak konfigurasi.
 
 ---
 
@@ -65,60 +158,70 @@
 ```text
 personal-fresh-linux-setup/
 ├── fedora-setup/
-│   ├── setup.sh                 # 🚀 Entry point utama (TUI Launcher)
-│   ├── README.md                # Dokumentasi spesifik Fedora
+│   ├── setup.sh                 # 🚀 Entry point utama (Interactive TUI Launcher)
+│   ├── README.md                # Dokumentasi spesifik modul setup
 │   ├── scripts/
-│   │   ├── env.sh               # Repositori (RPM Fusion, Flathub) & DNF optimizer
-│   │   ├── setup_terminal.sh    # Shell, CLI tools, FiraCode & font Konsole
-│   │   ├── system_essentials.sh # Codecs, Hardware Acceleration, Btrfs & Sysctl
-│   │   ├── asus_setup.sh        # Kontrol baterai, kipas & GPU laptop ASUS
-│   │   ├── maintenance.sh       # Health check sistem, diagnostik & rollback dotfiles
-│   │   ├── rpm_apps.sh          # Menu seleksi aplikasi RPM (Antigravity, VSCode, Docker)
-│   │   └── flatpak_apps.sh      # Menu seleksi aplikasi Flatpak (ONLYOFFICE, Spotube)
+│   │   ├── env.sh               # Deteksi OS, repository environment & gum installer
+│   │   ├── setup_terminal.sh    # Setup Zsh, Starship, plugins, CLI tools, FiraCode & font
+│   │   ├── git_ssh_setup.sh     # Setup Git user identity, ed25519 SSH key & clipboard
+│   │   ├── system_essentials.sh # Multimedia codecs, hardware acceleration, Btrfs & tuning
+│   │   ├── asus_setup.sh        # Setup ASUS ROG/TUF battery, fan profiles & GPU switcher
+│   │   ├── maintenance.sh       # Diagnostik sistem, pembersihan cache, & rollback dotfiles
+│   │   ├── rpm_apps.sh          # Menu TUI instalasi aplikasi native sistem (DNF / APT)
+│   │   ├── flatpak_apps.sh      # Menu TUI instalasi aplikasi sandboxed (Flathub)
+│   │   └── zsh.sh               # Wrapper kompatibilitas ke setup_terminal.sh
 │   ├── configs/
-│   │   ├── .zshrc               # Konfigurasi Zsh + Pintasan kontrol ASUS/GPU
-│   │   ├── starship.toml        # Tema dan prompt Starship
+│   │   ├── .zshrc               # Dotfiles Zsh konfigurasi lengkap + custom aliases
+│   │   ├── starship.toml        # Tema dan prompt estetis Starship
 │   │   └── bigtext.txt          # ASCII Art Banner Header
 │   └── docs/
-│       └── software-development-list.txt # Daftar inventaris software sistem
+│       └── software-development-list.txt # Inventaris software pendukung
 ├── scripts/
 │   └── git-sync.sh              # 🤖 Otomasi Commit, Changelog & Push ke GitHub
+├── .github/
+│   └── workflows/
+│       └── ci.yml               # 🧪 GitHub Actions: ShellCheck, Docker Matrix & Tests
 ├── .agents/
 │   ├── hooks.json               # 🛡️ Lifecycle hooks: Syntax guard & secret leak blocker
-│   └── skills/                  # Kumpulan SOP & skill otomasi testing AI
+│   └── skills/                  # SOP otomasi testing container & maintenance skrip
 ├── CHANGELOG.md                 # 📜 Catatan riwayat pembaruan otomatis
-└── .gitignore                   # Proteksi keamanan token & file environment
+├── install.sh                   # ⚡ One-liner web installer (curl | bash)
+└── .gitignore                   # Proteksi keamanan token & file secret
 ```
 
 ---
 
-## ⚡ Instalasi Cepat (One-Liner Tanpa Manual Clone)
+## 📜 Riwayat Pembaruan Terkini (Latest Changelog Highlights)
 
-Sama seperti tool otomasi modern di Windows (seperti Chris Titus Tech WinUtil `irm ... | iex`), Anda dapat langsung menjalankan utilitas ini di mesin Fedora baru **hanya dengan satu baris perintah** tanpa perlu clone manual:
+Berikut adalah rangkuman pembaruan versi terbaru. Untuk riwayat selengkapnya, silakan baca berkas [CHANGELOG.md](CHANGELOG.md).
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/Hilal06/personal-fresh-linux-setup/main/install.sh | bash
-```
-
-*(Installer web ini akan otomatis menyiapkan lingkungan yang dibutuhkan di latar belakang dan langsung membuka antarmuka TUI interaktif).*
+> ### 🚀 `v2026.09.05` - Multi-Distro Support & Interactive Dotfiles Rollback
+> - **Dukungan Ubuntu Penuh**: Kompatibilitas untuk Ubuntu Desktop (GNOME) & Kubuntu (KDE Plasma) menggunakan package manager `apt`, termasuk setup repositori universe/multiverse dan instalasi eza.
+> - **Eksklusi Arch Linux**: Menghapus seluruh dependensi `pacman` dan menambahkan rejection guard yang menolak eksekusi pada Arch Linux demi menjaga integritas sistem.
+> - **Rollback Dotfiles Interaktif**: Utilitas pemulihan di `maintenance.sh` kini mendukung pemilihan snapshot waktu backup spesifik (`~/.dotfiles_backup/`) dengan pre-restore safety snapshot.
+> - **Modul Mandiri Git & SSH Key**: Menambahkan `git_ssh_setup.sh` dengan integrasi clipboard otomatis Wayland (`wl-copy`) & X11 (`xclip`).
+> - **Auto-Set Font GNOME & Konsole**: Mendukung konfigurasi font terminal otomatis untuk profil GNOME Terminal dan KDE Konsole.
+> - **CI/CD GitHub Actions Baru**: Pengujian otomatis terintegrasi menggunakan ShellCheck, `bash -n`, Docker container matrix (`fedora:latest` & `ubuntu:24.04`), dan Arch rejection assertion.
+> - **Perbaikan Tipografi**: Mengoreksi typo penulisan "Utillity" menjadi "Utility" di seluruh banner dan berkas proyek.
 
 ---
 
 ## 🤖 Otomasi Git Sync & Changelog
 
-Proyek ini dilengkapi alat otomasi sinkronisasi [scripts/git-sync.sh](scripts/git-sync.sh) yang otomatis mencatat riwayat perubahan file ke [CHANGELOG.md](CHANGELOG.md):
+Proyek ini dilengkapi alat otomasi sinkronisasi [scripts/git-sync.sh](scripts/git-sync.sh) yang secara otomatis mencatat riwayat perubahan file ke [CHANGELOG.md](CHANGELOG.md):
 
 ```bash
-# Jalankan dengan prompt interaktif:
+# Jalankan dengan antarmuka interaktif:
 ./scripts/git-sync.sh
 
 # Atau langsung berikan pesan commit:
 ./scripts/git-sync.sh "feat(terminal): update starship prompt color palette"
 ```
 
-*Skrip otomatis melakukan validasi kebocoran secret, mencatat diff file yang berubah beserta timestamp ke `CHANGELOG.md`, lalu melakukan `git commit` dan `git push origin main`.*
+*Skrip secara otomatis memeriksa potensi kebocoran token atau secret keys, mencatat diff file yang berubah beserta timestamp ke `CHANGELOG.md`, lalu melakukan `git commit` dan `git push origin main`.*
 
 ---
 
 ## 📜 Lisensi & Kontribusi
-Dilisensikan di bawah [MIT License](LICENSE). Bebas dipakai dan disesuaikan untuk konfigurasi workstation Anda!
+
+Dilisensikan di bawah [MIT License](LICENSE). Bebas digunakan, dimodifikasi, dan disesuaikan untuk kebutuhan personal workstation Anda!

@@ -2,7 +2,7 @@
 name: docker-sandbox-test
 description: >-
   Use this skill to safely test and validate Linux setup scripts inside clean, isolated
-  Docker containers (e.g. Fedora, Ubuntu, Arch) without touching the host operating system.
+  Docker containers (e.g. Fedora, Ubuntu) without touching the host operating system.
 ---
 
 # Docker Sandbox Test Skill

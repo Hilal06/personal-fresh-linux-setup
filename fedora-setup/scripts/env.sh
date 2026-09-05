@@ -17,17 +17,54 @@ success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 error() { echo -e "${RED}[ERROR]${NC} $1"; exit 1; }
 
-# Memeriksa package manager dnf
-if ! command -v dnf &>/dev/null; then
-    error "DNF package manager tidak ditemukan. Skrip ini ditujukan untuk Fedora."
+# Fallback untuk environment root / container minimal tanpa command sudo
+if ! command -v sudo &>/dev/null && [ "${EUID:-$(id -u)}" -eq 0 ]; then
+    sudo() { "$@"; }
+fi
+
+# Deteksi Package Manager & Distribusi
+if command -v pacman &>/dev/null; then
+    error "Distribusi Arch Linux (pacman) tidak didukung. Skrip ini hanya mendukung Fedora Workstation dan Ubuntu (KDE / GNOME)."
+fi
+
+if command -v dnf &>/dev/null; then
+    DISTRO_TYPE="fedora"
+elif command -v apt-get &>/dev/null || command -v apt &>/dev/null; then
+    DISTRO_TYPE="ubuntu"
+else
+    error "Distribusi sistem tidak didukung. Skrip ini hanya mendukung Fedora Workstation dan Ubuntu (KDE / GNOME)."
 fi
 
 # Memastikan gum terinstall (dibutuhkan untuk TUI)
 ensure_gum_installed() {
     if ! command -v gum &> /dev/null; then
-        info "gum belum terpasang. Menginstall gum dari repositori resmi..."
-        sudo dnf install -y gum >/dev/null 2>&1 || sudo dnf install -y gum
-        success "gum berhasil diinstall."
+        info "gum belum terpasang. Menginstall gum..."
+        if [ "$DISTRO_TYPE" = "fedora" ]; then
+            sudo dnf install -y gum >/dev/null 2>&1 || sudo dnf install -y gum
+        elif [ "$DISTRO_TYPE" = "ubuntu" ]; then
+            sudo apt-get update -qq >/dev/null 2>&1 || true
+            sudo apt-get install -y -qq curl gpg >/dev/null 2>&1 || true
+            sudo mkdir -p /etc/apt/keyrings
+            curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor --yes -o /etc/apt/keyrings/charm.gpg 2>/dev/null || true
+            echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list >/dev/null
+            sudo apt-get update -qq >/dev/null 2>&1 || true
+            sudo apt-get install -y -qq gum >/dev/null 2>&1 || {
+                local GUM_TEMP
+                GUM_TEMP="$(mktemp -d)"
+                curl -fsSL https://github.com/charmbracelet/gum/releases/latest/download/gum_linux_amd64.tar.gz -o "$GUM_TEMP/gum.tar.gz" 2>/dev/null || true
+                if [ -s "$GUM_TEMP/gum.tar.gz" ]; then
+                    tar -xzf "$GUM_TEMP/gum.tar.gz" -C "$GUM_TEMP"
+                    sudo cp "$GUM_TEMP"/gum_*_linux_amd64/gum /usr/local/bin/ 2>/dev/null || sudo cp "$GUM_TEMP/gum" /usr/local/bin/ 2>/dev/null || true
+                fi
+                rm -rf "$GUM_TEMP"
+            }
+        fi
+
+        if command -v gum &>/dev/null; then
+            success "gum berhasil diinstall."
+        else
+            error "Gagal memasang 'gum'. Silakan pasang gum secara manual."
+        fi
     fi
 }
 
@@ -56,22 +93,35 @@ optimize_dnf_performance() {
 
 # Fungsi inisialisasi repositori (RPM Fusion & Flathub) secara cepat & idempoten
 setup_environment_repos() {
-    optimize_dnf_performance
+    if [ "$DISTRO_TYPE" = "fedora" ]; then
+        optimize_dnf_performance
 
-    # 1. Periksa apakah RPM Fusion sudah terpasang
-    if ! rpm -q rpmfusion-free-release &>/dev/null || ! rpm -q rpmfusion-nonfree-release &>/dev/null; then
-        info "Menginstall RPM Fusion Free & Non-Free..."
-        local FEDORA_VER
-        FEDORA_VER="$(rpm -E %fedora)"
-        sudo dnf install -y \
-            "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-${FEDORA_VER}.noarch.rpm" \
-            "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-${FEDORA_VER}.noarch.rpm" >/dev/null 2>&1 || true
-    fi
+        # 1. Periksa apakah RPM Fusion sudah terpasang
+        if ! rpm -q rpmfusion-free-release &>/dev/null || ! rpm -q rpmfusion-nonfree-release &>/dev/null; then
+            info "Menginstall RPM Fusion Free & Non-Free..."
+            local FEDORA_VER
+            FEDORA_VER="$(rpm -E %fedora 2>/dev/null || echo '41')"
+            sudo dnf install -y \
+                "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-${FEDORA_VER}.noarch.rpm" \
+                "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-${FEDORA_VER}.noarch.rpm" >/dev/null 2>&1 || true
+        fi
 
-    # 2. Periksa RPM Fusion Tainted
-    if ! rpm -q rpmfusion-free-release-tainted &>/dev/null || ! rpm -q rpmfusion-nonfree-release-tainted &>/dev/null; then
-        info "Menginstall RPM Fusion Tainted..."
-        sudo dnf install -y rpmfusion-free-release-tainted rpmfusion-nonfree-release-tainted >/dev/null 2>&1 || true
+        # 2. Periksa RPM Fusion Tainted
+        if ! rpm -q rpmfusion-free-release-tainted &>/dev/null || ! rpm -q rpmfusion-nonfree-release-tainted &>/dev/null; then
+            info "Menginstall RPM Fusion Tainted..."
+            sudo dnf install -y rpmfusion-free-release-tainted rpmfusion-nonfree-release-tainted >/dev/null 2>&1 || true
+        fi
+    elif [ "$DISTRO_TYPE" = "ubuntu" ]; then
+        info "Memeriksa repositori universe & multiverse pada Ubuntu..."
+        sudo apt-get update -qq >/dev/null 2>&1 || true
+        if command -v add-apt-repository &>/dev/null; then
+            sudo add-apt-repository -y universe >/dev/null 2>&1 || true
+            sudo add-apt-repository -y multiverse >/dev/null 2>&1 || true
+        else
+            sudo apt-get install -y -qq software-properties-common >/dev/null 2>&1 || true
+            sudo add-apt-repository -y universe >/dev/null 2>&1 || true
+            sudo add-apt-repository -y multiverse >/dev/null 2>&1 || true
+        fi
     fi
 
     # 3. Flathub remote

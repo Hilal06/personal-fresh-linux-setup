@@ -1,7 +1,7 @@
 # Project Rules & Agent Guidelines
 
 ## Repository Overview
-`personal-fresh-linux-setup` is a repository containing automation scripts and configuration profiles to configure and bootstrap fresh Linux installations (primary focus on Fedora, Debian/Ubuntu, and Arch Linux) with modern CLI tools, development environments, and terminal configurations (Zsh, Starship, Zoxide, FZF, Bat, Eza, FD, etc.).
+`personal-fresh-linux-setup` is a repository containing automation scripts and configuration profiles to configure and bootstrap fresh Linux installations (primary focus on Fedora Workstation and Ubuntu KDE or GNOME) with modern CLI tools, development environments, and terminal configurations (Zsh, Starship, Zoxide, FZF, Bat, Eza, FD, etc.).
 
 ---
 
@@ -19,10 +19,11 @@
   * `error()`: Critical failures (`[ERROR]` + exit)
 
 ### 2. Multi-Distro Support & Detection
+Only support **Fedora Workstation** and **Ubuntu (GNOME or KDE Plasma)**. **DO NOT support Arch-based distributions (`pacman`)**.
 Always check for available package managers before executing installation commands:
-* **DNF / RPM-based**: Fedora / RHEL (`command -v dnf`)
-* **APT / Debian-based**: Ubuntu / Debian (`command -v apt`)
-* **Pacman / Arch-based**: Arch Linux / EndeavourOS (`command -v pacman`)
+* **DNF / RPM-based**: Fedora Workstation (`command -v dnf`)
+* **APT / Debian-based**: Ubuntu (`command -v apt` / `command -v apt-get`)
+* **Arch Linux / Pacman**: Strictly unsupported. Do not include pacman installation commands or Arch-specific branches.
 * Provide fallback instructions or warnings if a package is not natively available in the default package manager repositories.
 
 ### 3. Modularity & Organization

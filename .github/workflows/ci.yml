@@ -1,0 +1,112 @@
+name: CI & Multi-Distro Automation Test
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  shellcheck:
+    name: ShellCheck Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: '.'
+          format: tty
+          severity: warning
+          ignore_paths: >-
+            fedora-setup/configs
+
+  syntax-check:
+    name: Bash Syntax Verification (bash -n)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Verify Syntax of All Shell Scripts
+        run: |
+          for s in fedora-setup/setup.sh fedora-setup/scripts/*.sh install.sh scripts/*.sh; do
+            echo "Checking: $s"
+            bash -n "$s" || exit 1
+          done
+          echo "All shell scripts passed syntax inspection."
+
+  container-tests:
+    name: Container Validation (${{ matrix.distro.name }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        distro:
+          - name: "Fedora Workstation"
+            image: "fedora:latest"
+            expected_type: "fedora"
+          - name: "Ubuntu"
+            image: "ubuntu:24.04"
+            expected_type: "ubuntu"
+
+    container:
+      image: ${{ matrix.distro.image }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Verify Distro Environment & Scripts
+        run: |
+          echo "=== Testing on ${{ matrix.distro.name }} (${{ matrix.distro.image }}) ==="
+          
+          # 1. Syntax check inside container
+          for s in fedora-setup/setup.sh fedora-setup/scripts/*.sh install.sh scripts/*.sh; do
+            bash -n "$s" || exit 1
+          done
+
+          # 2. Package manager and Gum check in env.sh
+          source fedora-setup/scripts/env.sh
+          echo "Detected DISTRO_TYPE: $DISTRO_TYPE"
+          if [ "$DISTRO_TYPE" != "${{ matrix.distro.expected_type }}" ]; then
+            echo "Expected distro type '${{ matrix.distro.expected_type }}', got '$DISTRO_TYPE'"
+            exit 1
+          fi
+
+          # 3. Ensure gum is installed and usable
+          command -v gum
+          gum --version
+
+  arch-rejection-test:
+    name: Verify Unsupported Distro Rejection (No Arch/Pacman)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Assert Pacman triggers graceful error
+        run: |
+          # Create fake pacman binary to simulate Arch environment
+          mkdir -p /tmp/fake-arch
+          touch /tmp/fake-arch/pacman && chmod +x /tmp/fake-arch/pacman
+          export PATH="/tmp/fake-arch:$PATH"
+
+          # Verify env.sh aborts with error
+          if bash fedora-setup/scripts/env.sh 2>&1 | grep -q "Arch Linux (pacman) tidak didukung"; then
+            echo "Arch rejection check passed for env.sh!"
+          else
+            echo "Arch rejection failed in env.sh"
+            exit 1
+          fi
+
+          # Verify install.sh aborts with error
+          if bash install.sh 2>&1 | grep -q "Arch Linux (pacman) tidak didukung"; then
+            echo "Arch rejection check passed for install.sh!"
+          else
+            echo "Arch rejection failed in install.sh"
+            exit 1
+          fi

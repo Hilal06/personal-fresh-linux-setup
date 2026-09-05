@@ -7,9 +7,9 @@ echo ""
 gum style \
     --foreground 33 --border-foreground 33 --border rounded \
     --align center --width 64 --padding "1 2" --bold \
-    "RPM APPLICATION REPOSITORY" "DNF, Developer Tools, Antigravity & System Utilities"
+    "NATIVE APPLICATION REPOSITORY" "Developer Tools, Antigravity, VSCode, Docker & Utilities"
 
-info "Pilih aplikasi berbasis RPM (DNF) yang ingin diinstall (Spasi untuk memilih, Enter untuk konfirmasi):"
+info "Pilih aplikasi sistem native (DNF / APT) yang ingin diinstall (Spasi untuk memilih, Enter untuk konfirmasi):"
 
 CHOICES=$(gum choose --no-limit \
     "Development Tools (gcc, make, git, curl, wget, cmake)" \
@@ -24,7 +24,7 @@ CHOICES=$(gum choose --no-limit \
     "Flatseal (Flatpak Permissions Manager)")
 
 if [ -z "$CHOICES" ]; then
-    info "Tidak ada aplikasi RPM yang dipilih."
+    info "Tidak ada aplikasi native yang dipilih."
     exit 0
 fi
 
@@ -35,7 +35,11 @@ for choice in "${SELECTED_APPS[@]}"; do
     case "$choice" in
         "Development Tools"*)
             info "Menginstall Development Tools..."
-            sudo dnf install -y gcc gcc-c++ make git curl wget cmake
+            if [ "$DISTRO_TYPE" = "fedora" ]; then
+                sudo dnf install -y gcc gcc-c++ make git curl wget cmake
+            elif [ "$DISTRO_TYPE" = "ubuntu" ]; then
+                sudo apt-get install -y build-essential gcc g++ make git curl wget cmake
+            fi
             ;;
         "Google Antigravity CLI (agy)")
             info "Menginstall Google Antigravity CLI (agy)..."
@@ -82,41 +86,87 @@ DESKTOP_EOF
             ;;
         "Visual Studio Code")
             info "Menginstall Visual Studio Code..."
-            sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-            sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
-            sudo dnf check-update || true
-            sudo dnf install -y code
+            if [ "$DISTRO_TYPE" = "fedora" ]; then
+                sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+                sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'
+                sudo dnf check-update || true
+                sudo dnf install -y code
+            elif [ "$DISTRO_TYPE" = "ubuntu" ]; then
+                sudo apt-get install -y wget gpg apt-transport-https
+                wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /tmp/packages.microsoft.gpg
+                sudo install -D -o root -g root -m 644 /tmp/packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
+                rm -f /tmp/packages.microsoft.gpg
+                echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
+                sudo apt-get update -qq
+                sudo apt-get install -y code
+            fi
             ;;
         "Docker Engine & Docker Compose")
             info "Menginstall Docker Engine & Docker Compose..."
-            sudo dnf -y install dnf-plugins-core
-            sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
-            sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+            if [ "$DISTRO_TYPE" = "fedora" ]; then
+                sudo dnf -y install dnf-plugins-core
+                sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+                sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+            elif [ "$DISTRO_TYPE" = "ubuntu" ]; then
+                sudo apt-get update -qq
+                sudo apt-get install -y ca-certificates curl
+                sudo install -m 0755 -d /etc/apt/keyrings
+                sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+                sudo chmod a+r /etc/apt/keyrings/docker.asc
+                echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+                sudo apt-get update -qq
+                sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+            fi
             sudo systemctl enable --now docker
             sudo usermod -aG docker "$USER"
             warn "User $USER telah ditambahkan ke grup 'docker'. Harap logout dan login kembali untuk menggunakan docker tanpa sudo."
             ;;
         "Fastfetch & Neovim")
             info "Menginstall Fastfetch & Neovim..."
-            sudo dnf install -y fastfetch neovim
+            if [ "$DISTRO_TYPE" = "fedora" ]; then
+                sudo dnf install -y fastfetch neovim
+            elif [ "$DISTRO_TYPE" = "ubuntu" ]; then
+                sudo apt-get install -y neovim
+                sudo apt-get install -y fastfetch 2>/dev/null || {
+                    sudo add-apt-repository -y ppa:zhangsongcui3371/fastfetch 2>/dev/null || true
+                    sudo apt-get update -qq 2>/dev/null || true
+                    sudo apt-get install -y fastfetch 2>/dev/null || true
+                }
+            fi
             ;;
         "BTop"*)
             info "Menginstall BTop..."
-            sudo dnf install -y btop
+            if [ "$DISTRO_TYPE" = "fedora" ]; then
+                sudo dnf install -y btop
+            elif [ "$DISTRO_TYPE" = "ubuntu" ]; then
+                sudo apt-get install -y btop
+            fi
             ;;
         "BleachBit (System Cleaner)")
             info "Menginstall BleachBit..."
-            sudo dnf install -y bleachbit
+            if [ "$DISTRO_TYPE" = "fedora" ]; then
+                sudo dnf install -y bleachbit
+            elif [ "$DISTRO_TYPE" = "ubuntu" ]; then
+                sudo apt-get install -y bleachbit
+            fi
             ;;
         "EasyEffects & Plugins (Audio Enhancer / Equalizer)")
-            info "Menginstall EasyEffects dan audio plugins (LSP, Calf)..."
-            sudo dnf install -y easyeffects lsp-plugins-lv2 lv2-calf-plugins
+            info "Menginstall EasyEffects..."
+            if [ "$DISTRO_TYPE" = "fedora" ]; then
+                sudo dnf install -y easyeffects lsp-plugins-lv2 lv2-calf-plugins
+            elif [ "$DISTRO_TYPE" = "ubuntu" ]; then
+                sudo apt-get install -y easyeffects 2>/dev/null || sudo flatpak install -y flathub com.github.wwmm.easyeffects
+            fi
             ;;
         "Flatseal (Flatpak Permissions Manager)")
             info "Menginstall Flatseal..."
-            sudo dnf install -y flatseal || sudo flatpak install -y flathub com.github.tchx84.Flatseal
+            if [ "$DISTRO_TYPE" = "fedora" ]; then
+                sudo dnf install -y flatseal || sudo flatpak install -y flathub com.github.tchx84.Flatseal
+            elif [ "$DISTRO_TYPE" = "ubuntu" ]; then
+                sudo flatpak install -y flathub com.github.tchx84.Flatseal
+            fi
             ;;
     esac
 done
 
-success "Instalasi aplikasi RPM selesai."
+success "Instalasi aplikasi native selesai."

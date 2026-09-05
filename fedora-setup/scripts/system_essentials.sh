@@ -32,85 +32,122 @@ for choice in "${SELECTED_OPTS[@]}"; do
     case "$choice" in
         "Multimedia Codecs Lengkap"*)
             info "Menginstall Multimedia Codecs Lengkap..."
-            gum spin --spinner dot --title "Mengganti ffmpeg-free dengan full FFmpeg (RPM Fusion)..." -- \
-                sudo dnf swap -y ffmpeg-free ffmpeg --allowerasing || true
+            if [ "$DISTRO_TYPE" = "fedora" ]; then
+                gum spin --spinner dot --title "Mengganti ffmpeg-free dengan full FFmpeg (RPM Fusion)..." -- \
+                    sudo dnf swap -y ffmpeg-free ffmpeg --allowerasing || true
 
-            gum spin --spinner dot --title "Menginstall multimedia packages & codecs..." -- \
-                sudo dnf groupupdate -y multimedia --setop="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin || true
-            sudo dnf groupupdate -y sound-and-video || true
+                gum spin --spinner dot --title "Menginstall multimedia packages & codecs..." -- \
+                    sudo dnf groupupdate -y multimedia --setop="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin || true
+                sudo dnf groupupdate -y sound-and-video || true
 
-            gum spin --spinner dot --title "Menginstall GStreamer plugins & libdvdcss..." -- \
-                sudo dnf install -y \
-                    gstreamer1-plugins-bad-freeworld \
-                    gstreamer1-plugins-ugly \
-                    gstreamer1-plugins-good-extras \
-                    gstreamer1-plugin-openh264 \
-                    gstreamer1-libav \
-                    lame-mp3x \
-                    libdvdcss || true
+                gum spin --spinner dot --title "Menginstall GStreamer plugins & libdvdcss..." -- \
+                    sudo dnf install -y \
+                        gstreamer1-plugins-bad-freeworld \
+                        gstreamer1-plugins-ugly \
+                        gstreamer1-plugins-good-extras \
+                        gstreamer1-plugin-openh264 \
+                        gstreamer1-libav \
+                        lame-mp3x \
+                        libdvdcss || true
+            elif [ "$DISTRO_TYPE" = "ubuntu" ]; then
+                gum spin --spinner dot --title "Menginstall multimedia codecs & ffmpeg (Ubuntu)..." -- \
+                    sudo apt-get install -y ubuntu-restricted-extras ffmpeg gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-plugins-good gstreamer1.0-libav lame || true
+            fi
             success "Multimedia Codecs berhasil diinstall."
             ;;
         "Hardware Video Acceleration / Drivers"*)
             info "Mengonfigurasi Hardware Video Acceleration Drivers..."
-            gum spin --spinner dot --title "Mengganti Mesa drivers dengan freeworld (RPM Fusion)..." -- \
-                sudo dnf swap -y mesa-va-drivers mesa-va-drivers-freeworld --allowerasing || true
-            gum spin --spinner dot --title "Mengganti Mesa VDPAU drivers dengan freeworld..." -- \
-                sudo dnf swap -y mesa-vdpau-drivers mesa-vdpau-drivers-freeworld --allowerasing || true
+            if [ "$DISTRO_TYPE" = "fedora" ]; then
+                gum spin --spinner dot --title "Mengganti Mesa drivers dengan freeworld (RPM Fusion)..." -- \
+                    sudo dnf swap -y mesa-va-drivers mesa-va-drivers-freeworld --allowerasing || true
+                gum spin --spinner dot --title "Mengganti Mesa VDPAU drivers dengan freeworld..." -- \
+                    sudo dnf swap -y mesa-vdpau-drivers mesa-vdpau-drivers-freeworld --allowerasing || true
 
-            gum spin --spinner dot --title "Menginstall Intel/AMD VA-API drivers..." -- \
-                sudo dnf install -y \
-                    intel-media-driver \
-                    libva-intel-driver \
-                    libva-utils \
-                    vdpauinfo || true
+                gum spin --spinner dot --title "Menginstall Intel/AMD VA-API drivers..." -- \
+                    sudo dnf install -y \
+                        intel-media-driver \
+                        libva-intel-driver \
+                        libva-utils \
+                        vdpauinfo || true
+            elif [ "$DISTRO_TYPE" = "ubuntu" ]; then
+                gum spin --spinner dot --title "Menginstall VA-API & VDPAU drivers (Ubuntu)..." -- \
+                    sudo apt-get install -y va-driver-all mesa-va-drivers mesa-vdpau-drivers vainfo vdpauinfo intel-media-va-driver || true
+            fi
             success "Hardware Video Acceleration Drivers berhasil dikonfigurasi."
             ;;
         "System Utilities & Compression"*)
             info "Menginstall System Utilities & Compression Tools..."
-            gum spin --spinner dot --title "Menginstall utilitas sistem & kompresi..." -- \
-                sudo dnf install -y \
-                    p7zip \
-                    p7zip-plugins \
-                    unrar \
-                    tar \
-                    rsync \
-                    curl \
-                    wget \
-                    pciutils \
-                    lshw
+            if [ "$DISTRO_TYPE" = "fedora" ]; then
+                gum spin --spinner dot --title "Menginstall utilitas sistem & kompresi..." -- \
+                    sudo dnf install -y \
+                        p7zip \
+                        p7zip-plugins \
+                        unrar \
+                        tar \
+                        rsync \
+                        curl \
+                        wget \
+                        pciutils \
+                        lshw
+            elif [ "$DISTRO_TYPE" = "ubuntu" ]; then
+                gum spin --spinner dot --title "Menginstall utilitas sistem & kompresi (Ubuntu)..." -- \
+                    sudo apt-get install -y \
+                        p7zip-full \
+                        unrar \
+                        tar \
+                        rsync \
+                        curl \
+                        wget \
+                        pciutils \
+                        lshw
+            fi
             success "System Utilities & Compression berhasil diinstall."
             ;;
         "KDE Plasma Enhancements"*)
-            info "Menginstall KDE Plasma Enhancements..."
-            gum spin --spinner dot --title "Menginstall integrasi KDE Connect & Flatpak KCM..." -- \
-                sudo dnf install -y \
-                    kde-connect \
-                    kcm-flatpak \
-                    plasma-discover-flatpak-backend || true
-            success "KDE Plasma Enhancements berhasil diinstall."
+            info "Menginstall Desktop Enhancements..."
+            if [ "$DISTRO_TYPE" = "fedora" ]; then
+                gum spin --spinner dot --title "Menginstall integrasi KDE Connect & Flatpak KCM..." -- \
+                    sudo dnf install -y \
+                        kde-connect \
+                        kcm-flatpak \
+                        plasma-discover-flatpak-backend || true
+            elif [ "$DISTRO_TYPE" = "ubuntu" ]; then
+                gum spin --spinner dot --title "Menginstall integrasi Desktop (Ubuntu)..." -- \
+                    sudo apt-get install -y kdeconnect || true
+            fi
+            success "Desktop Enhancements berhasil diinstall."
             ;;
         "Btrfs Assistant & Snapper"*)
-            info "Menginstall Btrfs Assistant, Snapper, dan Btrfs Maintenance..."
-            gum spin --spinner dot --title "Menginstall btrfs-assistant, snapper, btrfsmaintenance..." -- \
-                sudo dnf install -y btrfs-assistant snapper btrfsmaintenance btrfs-progs
+            info "Menginstall Snapper dan Btrfs Tools..."
+            if [ "$DISTRO_TYPE" = "fedora" ]; then
+                gum spin --spinner dot --title "Menginstall btrfs-assistant, snapper, btrfsmaintenance..." -- \
+                    sudo dnf install -y btrfs-assistant snapper btrfsmaintenance btrfs-progs
+            elif [ "$DISTRO_TYPE" = "ubuntu" ]; then
+                gum spin --spinner dot --title "Menginstall snapper & btrfs-progs (Ubuntu)..." -- \
+                    sudo apt-get install -y snapper btrfs-progs || true
+            fi
             
             # Setup konfigurasi snapper default untuk root jika belum ada
-            if ! sudo snapper list-configs 2>/dev/null | grep -q "root"; then
+            if command -v snapper &>/dev/null && ! sudo snapper list-configs 2>/dev/null | grep -q "root"; then
                 info "Membuat konfigurasi snapper awal untuk root (/)...."
                 sudo snapper -c root create-config / || warn "Snapper root config sudah ada atau gagal dibuat."
             fi
 
             # Aktifkan service & timer snapper
             sudo systemctl enable --now snapper-timeline.timer snapper-cleanup.timer 2>/dev/null || true
-            success "Btrfs Assistant & Snapper berhasil dikonfigurasi."
+            success "Snapper & Btrfs Tools berhasil dikonfigurasi."
             ;;
         "System Performance & Thermal Tuning"*)
             info "Menginstall & mengaktifkan thermal and performance daemons..."
-            gum spin --spinner dot --title "Menginstall thermald, tuned, preload..." -- \
-                sudo dnf install -y thermald tuned tuned-ppd preload
-            
-            info "Mengaktifkan service thermald, tuned, dan preload..."
-            sudo systemctl enable --now thermald tuned preload 2>/dev/null || true
+            if [ "$DISTRO_TYPE" = "fedora" ]; then
+                gum spin --spinner dot --title "Menginstall thermald, tuned, preload..." -- \
+                    sudo dnf install -y thermald tuned tuned-ppd preload
+                sudo systemctl enable --now thermald tuned preload 2>/dev/null || true
+            elif [ "$DISTRO_TYPE" = "ubuntu" ]; then
+                gum spin --spinner dot --title "Menginstall thermald & preload (Ubuntu)..." -- \
+                    sudo apt-get install -y thermald preload || true
+                sudo systemctl enable --now thermald preload 2>/dev/null || true
+            fi
             success "System Performance & Thermal Tuning berhasil dikonfigurasi."
             ;;
         "Kernel & Sysctl Desktop Tuning"*)

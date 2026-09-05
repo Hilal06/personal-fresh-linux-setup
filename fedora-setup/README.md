@@ -17,8 +17,8 @@ Skrip otomasi modular untuk melakukan post-installation setup dan konfigurasi si
 - **Git Identity & SSH Key Generator**: Wizard konfigurasi nama/email global Git dan pembuatan SSH Key `ed25519` otomatis untuk GitHub/GitLab.
 - **ASUS ROG/TUF & GPU Zsh Aliases**: Pintasan cepat di terminal untuk cek baterai (`asus-bat`), profil kipas (`asus-quiet`, `asus-bal`, `asus-perf`), dan switching GPU (`gpu-hybrid`, `gpu-igpu`, `gpu-dgpu`).
 - **Optimasi Kecepatan DNF**: Otomatis mengatur `max_parallel_downloads=10`, `fastestmirror=True`, dan `defaultyes=True` pada `/etc/dnf/dnf.conf`.
-- **Auto-Config Font Konsole KDE**: Otomatis menyetel font default profile Konsole ke `FiraCode Nerd Font` via `kwriteconfig6/5`.
-- **Safe Dotfiles Backup & Restore**: Backup terpusat ke direktori `~/.dotfiles_backup/` dengan opsi rollback instan.
+- **Auto-Config Font Terminal**: Otomatis menyetel profil KDE Konsole dan GNOME Terminal ke `FiraCode Nerd Font`.
+- **Safe Dotfiles Backup & Timestamped Rollback**: Backup terpusat ke direktori `~/.dotfiles_backup/` dengan opsi rollback riwayat backup berdasarkan timestamp secara interaktif.
 - **System Maintenance & Health Check**: Skrip diagnostik untuk mengecek baterai, status GPU, memory/zram, service status, membersihkan cache paket lama, dan health check filesystem Btrfs.
 - **Aplikasi Esensial & Produktivitas**: Pilihan cepat untuk menginstal Google Antigravity (CLI `agy` & IDE Desktop), ONLYOFFICE, Spotube, VLC, Pika Backup, Docker, VSCode, Neovim, Google Chrome, Discord, DBeaver, Bruno, dll.
 
@@ -28,13 +28,14 @@ fedora-setup/
 ├── setup.sh                 # Skrip eksekusi utama (Main Entry Point)
 ├── README.md                # Dokumentasi proyek
 ├── scripts/
-│   ├── env.sh               # Konfigurasi repository (RPM Fusion Tainted, Flathub) & DNF optimizer
-│   ├── setup_terminal.sh    # Setup Zsh, Starship, plugins, CLI tools, FiraCode & Konsole font
+│   ├── env.sh               # Konfigurasi repository (RPM Fusion, Flathub) & package manager check
+│   ├── setup_terminal.sh    # Setup Zsh, Starship, plugins, CLI tools, FiraCode & font terminal
+│   ├── git_ssh_setup.sh     # Setup Git user identity, ed25519 SSH key & clipboard integration
 │   ├── zsh.sh               # Wrapper kompatibilitas ke setup_terminal.sh
-│   ├── system_essentials.sh # Multimedia codecs, hardware acceleration, Btrfs & KDE tools
+│   ├── system_essentials.sh # Multimedia codecs, hardware acceleration, Btrfs & desktop tools
 │   ├── asus_setup.sh        # Setup & konfigurasi ASUS ROG / TUF gaming tools
-│   ├── maintenance.sh       # Diagnostik kesehatan sistem, pembersihan cache, & rollback
-│   ├── rpm_apps.sh          # Menu TUI instalasi aplikasi via DNF
+│   ├── maintenance.sh       # Diagnostik kesehatan sistem, pembersihan cache, & rollback dotfiles
+│   ├── rpm_apps.sh          # Menu TUI instalasi aplikasi native (DNF / APT)
 │   └── flatpak_apps.sh      # Menu TUI instalasi aplikasi via Flatpak
 ├── configs/
 │   ├── .zshrc               # Dotfiles konfigurasi Zsh
@@ -45,7 +46,7 @@ fedora-setup/
 ```
 
 ## 🛠 Prasyarat Sistem
-- **OS**: Fedora Linux (dioptimalkan untuk Fedora KDE 44)
+- **OS**: Fedora Workstation / KDE atau Ubuntu (KDE / GNOME). *Arch Linux tidak didukung.*
 - **Koneksi Internet**: Diperlukan untuk mengunduh package
 - **Hak Akses Sudo**: Pengguna saat ini harus memiliki hak eksekusi `sudo`
 

@@ -22,11 +22,11 @@ gum style \
 	"$(gum style --foreground 39 --bold '█░█ █ █░░ ▄▀█ █░░ █▀█ █▄▄')" \
 	"$(gum style --foreground 39 --bold '█▀█ █ █▄▄ █▀█ █▄▄ █▄█ █▄█')" \
 	"" \
-	"Fresh Fedora KDE Utillity" \
+	"Fresh Linux Setup Utility" \
 	"Personal System Setup & Automation Suite"
 
 # 3. Setup repository environment menggunakan spinner TUI (cepat & non-blocking)
-gum spin --spinner dot --title "Menyiapkan konfigurasi DNF, RPM Fusion & Flathub..." -- bash -c "source '$SCRIPT_DIR/scripts/env.sh' && setup_environment_repos"
+gum spin --spinner dot --title "Menyiapkan repositori & environment sistem..." -- bash -c "source '$SCRIPT_DIR/scripts/env.sh' && setup_environment_repos"
 
 echo ""
 info "Pilih tugas yang ingin Anda jalankan (Gunakan [Spasi] untuk memilih, [Enter] untuk konfirmasi):"
@@ -35,10 +35,11 @@ info "Pilih tugas yang ingin Anda jalankan (Gunakan [Spasi] untuk memilih, [Ente
 CHOICES=$(gum choose --no-limit \
     "Setup Shell & Terminal (Zsh, Starship, Dotfiles)" \
     "Install System Essentials & Media Codecs" \
-    "Install Aplikasi RPM (DNF / Official Repos)" \
+    "Install Aplikasi Sistem / Native (DNF / APT)" \
     "Install Aplikasi Flatpak (Flathub)" \
     "Setup & Konfigurasi ASUS ROG / TUF Utilities" \
-    "System Maintenance & Health Check")
+    "Setup Identitas Git & SSH Key Developer (GitHub)" \
+    "System Maintenance & Health Check (Rollback Dotfiles)")
 
 if [ -z "$CHOICES" ]; then
     warn "Tidak ada tugas yang dipilih. Keluar..."
@@ -61,9 +62,9 @@ for task in "${SELECTED_TASKS[@]}"; do
             gum style --foreground 99 --bold ">>> Menjalankan Instalasi System Essentials & Media Codecs..."
             "$SCRIPT_DIR/scripts/system_essentials.sh"
             ;;
-        "Install Aplikasi RPM (DNF / Official Repos)")
+        "Install Aplikasi Sistem / Native (DNF / APT)")
             echo ""
-            gum style --foreground 99 --bold ">>> Menjalankan Instalasi Aplikasi RPM..."
+            gum style --foreground 99 --bold ">>> Menjalankan Instalasi Aplikasi Sistem Native..."
             "$SCRIPT_DIR/scripts/rpm_apps.sh"
             ;;
         "Install Aplikasi Flatpak (Flathub)")
@@ -76,7 +77,12 @@ for task in "${SELECTED_TASKS[@]}"; do
             gum style --foreground 99 --bold ">>> Menjalankan Setup & Konfigurasi ASUS ROG / TUF Utilities..."
             "$SCRIPT_DIR/scripts/asus_setup.sh"
             ;;
-        "System Maintenance & Health Check")
+        "Setup Identitas Git & SSH Key Developer (GitHub)")
+            echo ""
+            gum style --foreground 99 --bold ">>> Menjalankan Setup Git & SSH Key..."
+            "$SCRIPT_DIR/scripts/git_ssh_setup.sh"
+            ;;
+        "System Maintenance & Health Check (Rollback Dotfiles)")
             echo ""
             gum style --foreground 99 --bold ">>> Menjalankan System Maintenance & Health Check..."
             "$SCRIPT_DIR/scripts/maintenance.sh"
@@ -88,4 +94,4 @@ echo ""
 gum style \
 	--foreground 82 --border-foreground 82 --border rounded \
 	--align center --width 64 --padding "1 2" --bold \
-	"🎉 SETUP SELESAI!" "Semua konfigurasi Fresh Fedora KDE Utillity berhasil diterapkan."
+	"🎉 SETUP SELESAI!" "Semua konfigurasi Fresh Linux Setup Utility berhasil diterapkan."

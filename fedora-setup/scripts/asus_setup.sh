@@ -64,13 +64,15 @@ install_asus_packages() {
         else
             success "Semua paket utilitas ASUS (asusctl, rog-control-center, supergfxctl) sudah terpasang."
         fi
-    elif command -v pacman &>/dev/null; then
+    elif command -v apt-get &>/dev/null || command -v apt &>/dev/null; then
         if ! command -v asusctl &>/dev/null || ! command -v supergfxctl &>/dev/null; then
-            info "Menginstall asusctl & supergfxctl via pacman..."
-            sudo pacman -S --noconfirm asusctl supergfxctl || warn "Gagal menginstall via pacman, silakan cek AUR (asusctl / rog-control-center)."
+            warn "Paket asusctl dan supergfxctl tidak tersedia di repository default Ubuntu."
+            warn "Untuk Ubuntu, silakan gunakan PPA resmi komunitas atau build dari source: https://asus-linux.org"
+        else
+            success "asusctl & supergfxctl sudah terpasang di sistem Ubuntu."
         fi
     else
-        warn "Package manager selain DNF/Pacman memerlukan build manual atau repositori pihak ketiga untuk asusctl."
+        warn "Package manager tidak didukung untuk instalasi otomatis asusctl."
     fi
 }
 

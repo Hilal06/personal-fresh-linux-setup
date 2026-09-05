@@ -19,9 +19,9 @@ info "Pilih tugas maintenance yang ingin dijalankan (Spasi untuk memilih, Enter 
 
 CHOICES=$(gum choose --no-limit \
     "System Health Check (Hardware, Services, GPU & Btrfs Status)" \
-    "Clean Package Caches & Old Kernels (DNF & Flatpak Clean)" \
+    "Clean Package Caches & Old Kernels (DNF / APT & Flatpak Clean)" \
     "Btrfs Scrub & Filesystem Health Check" \
-    "Restore Dotfiles dari Backup Terbaru (~/.dotfiles_backup)")
+    "Rollback / Restore Dotfiles dari Backup (~/.dotfiles_backup)")
 
 if [ -z "$CHOICES" ]; then
     info "Tidak ada tugas maintenance yang dipilih."
@@ -85,6 +85,11 @@ for task in "${SELECTED_TASKS[@]}"; do
                 sudo dnf clean all
                 info "Menghapus dependensi yang tidak lagi dibutuhkan (dnf autoremove)..."
                 sudo dnf autoremove -y
+            elif command -v apt-get &>/dev/null || command -v apt &>/dev/null; then
+                info "Membersihkan cache paket APT..."
+                sudo apt-get clean
+                info "Menghapus dependensi yang tidak lagi dibutuhkan (apt autoremove)..."
+                sudo apt-get autoremove -y
             fi
 
             if command -v flatpak &>/dev/null; then
@@ -117,9 +122,9 @@ for task in "${SELECTED_TASKS[@]}"; do
             fi
             ;;
 
-        "Restore Dotfiles dari Backup Terbaru"*)
+        "Rollback / Restore Dotfiles"*)
             echo ""
-            gum style --foreground 99 --bold ">>> Restore Dotfiles dari Backup..."
+            gum style --foreground 99 --bold ">>> Rollback / Restore Dotfiles dari Backup..."
             BACKUP_DIR="$HOME/.dotfiles_backup"
             
             if [ ! -d "$BACKUP_DIR" ]; then
@@ -127,24 +132,68 @@ for task in "${SELECTED_TASKS[@]}"; do
                 continue
             fi
 
-            if [ -f "$BACKUP_DIR/.zshrc.latest" ]; then
-                if gum confirm "Restore ~/.zshrc dari backup terakhir ($BACKUP_DIR/.zshrc.latest)?"; then
-                    cp "$BACKUP_DIR/.zshrc.latest" "$HOME/.zshrc"
-                    success "$HOME/.zshrc berhasil di-restore."
-                fi
-            else
-                info "Tidak ada backup .zshrc.latest."
-            fi
+            info "Pilih opsi pemulihan dotfiles:"
+            RESTORE_ACTION=$(gum choose \
+                "Rollback ~/.zshrc dari Riwayat Backup (Timestamp)" \
+                "Rollback ~/.config/starship.toml dari Riwayat Backup (Timestamp)" \
+                "Restore Semua dari Backup Terakhir (.latest)" \
+                "Batal")
 
-            if [ -f "$BACKUP_DIR/starship.toml.latest" ]; then
-                if gum confirm "Restore ~/.config/starship.toml dari backup terakhir?"; then
-                    mkdir -p "$HOME/.config"
-                    cp "$BACKUP_DIR/starship.toml.latest" "$HOME/.config/starship.toml"
-                    success "$HOME/.config/starship.toml berhasil di-restore."
-                fi
-            else
-                info "Tidak ada backup starship.toml.latest."
-            fi
+            case "$RESTORE_ACTION" in
+                "Rollback ~/.zshrc"*)
+                    mapfile -t ZSH_FILES < <(find "$BACKUP_DIR" -maxdepth 1 -name ".zshrc.backup.*" -printf "%f\n" 2>/dev/null | sort -r)
+                    if [ ${#ZSH_FILES[@]} -eq 0 ]; then
+                        warn "Tidak ada file riwayat backup ~/.zshrc di $BACKUP_DIR"
+                    else
+                        info "Pilih snapshot backup ~/.zshrc yang ingin di-restore:"
+                        CHOSEN_ZSH=$(gum choose "${ZSH_FILES[@]}")
+                        if [ -n "$CHOSEN_ZSH" ] && [ -f "$BACKUP_DIR/$CHOSEN_ZSH" ]; then
+                            if [ -f "$HOME/.zshrc" ]; then
+                                SAFETY_BACKUP="$BACKUP_DIR/.zshrc.pre_restore.$(date +%Y%m%d%H%M%S)"
+                                cp "$HOME/.zshrc" "$SAFETY_BACKUP"
+                                info "Safety snapshot dibuat: $SAFETY_BACKUP"
+                            fi
+                            cp "$BACKUP_DIR/$CHOSEN_ZSH" "$HOME/.zshrc"
+                            success "Berhasil merestore ~/.zshrc dari snapshot: $CHOSEN_ZSH"
+                        fi
+                    fi
+                    ;;
+
+                "Rollback ~/.config/starship.toml"*)
+                    mapfile -t STARSHIP_FILES < <(find "$BACKUP_DIR" -maxdepth 1 -name "starship.toml.backup.*" -printf "%f\n" 2>/dev/null | sort -r)
+                    if [ ${#STARSHIP_FILES[@]} -eq 0 ]; then
+                        warn "Tidak ada file riwayat backup starship.toml di $BACKUP_DIR"
+                    else
+                        info "Pilih snapshot backup starship.toml yang ingin di-restore:"
+                        CHOSEN_STARSHIP=$(gum choose "${STARSHIP_FILES[@]}")
+                        if [ -n "$CHOSEN_STARSHIP" ] && [ -f "$BACKUP_DIR/$CHOSEN_STARSHIP" ]; then
+                            mkdir -p "$HOME/.config"
+                            if [ -f "$HOME/.config/starship.toml" ]; then
+                                SAFETY_BACKUP="$BACKUP_DIR/starship.toml.pre_restore.$(date +%Y%m%d%H%M%S)"
+                                cp "$HOME/.config/starship.toml" "$SAFETY_BACKUP"
+                                info "Safety snapshot dibuat: $SAFETY_BACKUP"
+                            fi
+                            cp "$BACKUP_DIR/$CHOSEN_STARSHIP" "$HOME/.config/starship.toml"
+                            success "Berhasil merestore ~/.config/starship.toml dari snapshot: $CHOSEN_STARSHIP"
+                        fi
+                    fi
+                    ;;
+
+                "Restore Semua dari Backup Terakhir"*)
+                    if [ -f "$BACKUP_DIR/.zshrc.latest" ]; then
+                        cp "$BACKUP_DIR/.zshrc.latest" "$HOME/.zshrc"
+                        success "$HOME/.zshrc berhasil di-restore dari .latest"
+                    fi
+                    if [ -f "$BACKUP_DIR/starship.toml.latest" ]; then
+                        mkdir -p "$HOME/.config"
+                        cp "$BACKUP_DIR/starship.toml.latest" "$HOME/.config/starship.toml"
+                        success "$HOME/.config/starship.toml berhasil di-restore dari .latest"
+                    fi
+                    ;;
+                *)
+                    info "Batal melakukan pemulihan dotfiles."
+                    ;;
+            esac
             ;;
     esac
 done

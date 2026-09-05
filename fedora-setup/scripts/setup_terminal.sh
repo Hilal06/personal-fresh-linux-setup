@@ -22,14 +22,23 @@ info "Memulai setup dan konfigurasi terminal modern..."
 
 # 1. Install CLI Tools & Starship
 install_cli_tools() {
-    info "Menginstall CLI tools (zsh, git, curl, fzf, bat, eza, fd-find, zoxide, util-linux-user)..."
+    info "Menginstall CLI tools (zsh, git, curl, fzf, bat, eza, fd-find, zoxide, util-linux)..."
     if command -v dnf &>/dev/null; then
         sudo dnf install -y zsh git curl fzf bat eza fd-find zoxide util-linux-user
-    elif command -v apt &>/dev/null; then
-        sudo apt update
-        sudo apt install -y zsh git curl fzf bat fd-find zoxide util-linux
-    elif command -v pacman &>/dev/null; then
-        sudo pacman -Sy --noconfirm zsh git curl fzf bat eza fd zoxide
+    elif command -v apt-get &>/dev/null || command -v apt &>/dev/null; then
+        sudo apt-get update -qq
+        sudo apt-get install -y zsh git curl fzf bat fd-find zoxide util-linux
+        # Cek dan pasang eza untuk Ubuntu
+        if ! command -v eza &>/dev/null; then
+            if ! sudo apt-get install -y eza 2>/dev/null; then
+                info "Menyiapkan repository eza untuk Ubuntu..."
+                sudo mkdir -p /etc/apt/keyrings
+                wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc 2>/dev/null | sudo gpg --dearmor --yes -o /etc/apt/keyrings/gierens.gpg 2>/dev/null || true
+                echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list >/dev/null 2>&1 || true
+                sudo apt-get update -qq 2>/dev/null || true
+                sudo apt-get install -y eza >/dev/null 2>&1 || warn "eza tidak tersedia di repo apt, alias ls fallback di .zshrc akan digunakan."
+            fi
+        fi
     else
         warn "Package manager tidak dikenali. Pastikan tool esensial terminal sudah terinstall manual."
     fi
@@ -51,38 +60,29 @@ install_firacode_nerd_font() {
     # Cek apakah font sudah terdeteksi di sistem
     if fc-list : family | grep -qi "FiraCode Nerd Font"; then
         success "FiraCode Nerd Font sudah terinstall di sistem."
+        configure_kde_konsole_font
+        configure_gnome_terminal_font
         return 0
     fi
 
     info "FiraCode Nerd Font belum ditemukan. Memulai proses instalasi..."
 
-    local INSTALLED=false
+    # Instalasi langsung dari rilis resmi Nerd Fonts GitHub
+    info "Mengunduh FiraCode Nerd Font dari rilis resmi GitHub..."
+    local FONT_DIR="$HOME/.local/share/fonts/NerdFonts"
+    local TEMP_DIR
+    TEMP_DIR="$(mktemp -d)"
 
-    # Coba via package manager terlebih dahulu jika tersedia
-    if command -v pacman &>/dev/null; then
-        info "Menginstall ttf-firacode-nerd via pacman..."
-        sudo pacman -S --noconfirm ttf-firacode-nerd >/dev/null 2>&1 && INSTALLED=true || true
+    mkdir -p "$FONT_DIR"
+
+    if curl -fLo "$TEMP_DIR/FiraCode.zip" "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip"; then
+        info "Mengekstrak FiraCode Nerd Font ke $FONT_DIR..."
+        unzip -q -o "$TEMP_DIR/FiraCode.zip" -d "$FONT_DIR" "*.ttf" || unzip -q -o "$TEMP_DIR/FiraCode.zip" -d "$FONT_DIR"
+    else
+        warn "Gagal mengunduh FiraCode Nerd Font dari GitHub."
     fi
 
-    # Fallback / Instalasi langsung dari rilis resmi Nerd Fonts GitHub
-    if [ "$INSTALLED" = false ]; then
-        info "Mengunduh FiraCode Nerd Font dari rilis resmi GitHub..."
-        local FONT_DIR="$HOME/.local/share/fonts/NerdFonts"
-        local TEMP_DIR
-        TEMP_DIR="$(mktemp -d)"
-
-        mkdir -p "$FONT_DIR"
-
-        if curl -fLo "$TEMP_DIR/FiraCode.zip" "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip"; then
-            info "Mengekstrak FiraCode Nerd Font ke $FONT_DIR..."
-            unzip -q -o "$TEMP_DIR/FiraCode.zip" -d "$FONT_DIR" "*.ttf" || unzip -q -o "$TEMP_DIR/FiraCode.zip" -d "$FONT_DIR"
-            INSTALLED=true
-        else
-            warn "Gagal mengunduh FiraCode Nerd Font dari GitHub."
-        fi
-
-        rm -rf "$TEMP_DIR"
-    fi
+    rm -rf "$TEMP_DIR"
 
     # Refresh font cache
     if command -v fc-cache &>/dev/null; then
@@ -97,8 +97,9 @@ install_firacode_nerd_font() {
         warn "Instalasi font selesai, pastikan mengatur font terminal Anda ke 'FiraCode Nerd Font'."
     fi
 
-    # Auto-set font untuk KDE Konsole jika pengguna berada di KDE Plasma
+    # Auto-set font untuk terminal (KDE Plasma & GNOME Terminal)
     configure_kde_konsole_font
+    configure_gnome_terminal_font
 }
 
 # 3. Konfigurasi Otomatis Font Konsole KDE
@@ -128,6 +129,22 @@ configure_kde_konsole_font() {
         "$KWRITE_BIN" --file "$PROFILE_PATH" --group "Appearance" --key "Font" "FiraCode Nerd Font,11,-1,5,700,0,0,0,0,0,0,0,0,0,0,1,Bold"
         "$KWRITE_BIN" --file "$PROFILE_PATH" --group "Appearance" --key "UseFontLineChararacters" "false"
         success "Font KDE Konsole berhasil diatur ke FiraCode Nerd Font."
+    fi
+}
+
+# 4. Konfigurasi Otomatis Font GNOME Terminal
+configure_gnome_terminal_font() {
+    if command -v gsettings &>/dev/null; then
+        if gsettings list-schemas 2>/dev/null | grep -q "org.gnome.Terminal.ProfilesList"; then
+            local DEFAULT_PROFILE
+            DEFAULT_PROFILE="$(gsettings get org.gnome.Terminal.ProfilesList default 2>/dev/null | tr -d \'\")"
+            if [ -n "$DEFAULT_PROFILE" ]; then
+                info "Mendeteksi GNOME Terminal. Menerapkan 'FiraCode Nerd Font'..."
+                gsettings set "org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles/:$DEFAULT_PROFILE/" use-system-font false 2>/dev/null || true
+                gsettings set "org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles/:$DEFAULT_PROFILE/" font 'FiraCode Nerd Font 11' 2>/dev/null || true
+                success "Font GNOME Terminal berhasil diatur ke FiraCode Nerd Font."
+            fi
+        fi
     fi
 }
 
@@ -238,60 +255,12 @@ set_default_shell() {
 
 # 7. Konfigurasi Git Identity & SSH Key Generator
 configure_git_and_ssh() {
-    if ! command -v git &>/dev/null; then
-        return 0
-    fi
-
-    if gum confirm "Apakah Anda ingin mengonfigurasi identitas Git & generate SSH Key (GitHub)?"; then
-        echo ""
-        gum style --foreground 99 --bold ">>> Konfigurasi Git & SSH Key Developer..."
-        
-        local CURRENT_NAME CURRENT_EMAIL
-        CURRENT_NAME="$(git config --global user.name 2>/dev/null || echo '')"
-        CURRENT_EMAIL="$(git config --global user.email 2>/dev/null || echo '')"
-
-        local GIT_NAME GIT_EMAIL
-        GIT_NAME=$(gum input --placeholder "Nama Lengkap untuk Git commit" --value "$CURRENT_NAME" --header "Masukkan Nama Git:")
-        GIT_EMAIL=$(gum input --placeholder "Email untuk Git commit" --value "$CURRENT_EMAIL" --header "Masukkan Email Git:")
-
-        if [ -n "$GIT_NAME" ]; then
-            git config --global user.name "$GIT_NAME"
-            git config --global init.defaultBranch main
-            success "Git user.name diatur ke: $GIT_NAME"
-        fi
-
-        if [ -n "$GIT_EMAIL" ]; then
-            git config --global user.email "$GIT_EMAIL"
-            success "Git user.email diatur ke: $GIT_EMAIL"
-        fi
-
-        # Generate SSH key jika belum ada
-        local SSH_KEY="$HOME/.ssh/id_ed25519"
-        if [ ! -f "$SSH_KEY" ]; then
-            if gum confirm "Generate SSH Key baru (ed25519) untuk GitHub/GitLab?"; then
-                mkdir -p "$HOME/.ssh"
-                chmod 700 "$HOME/.ssh"
-                local SSH_COMMENT="${GIT_EMAIL:-$USER@fedora}"
-                ssh-keygen -t ed25519 -C "$SSH_COMMENT" -f "$SSH_KEY" -N ""
-                eval "$(ssh-agent -s)" >/dev/null 2>&1 || true
-                ssh-add "$SSH_KEY" >/dev/null 2>&1 || true
-                
-                echo ""
-                success "SSH Key ed25519 berhasil dibuat di: $SSH_KEY"
-                gum style --border rounded --padding "1 2" --border-foreground 82 \
-                    "PUBLIC SSH KEY ANDA (Copy ke GitHub Settings -> SSH and GPG Keys):" \
-                    "$(cat "$SSH_KEY.pub")"
-            fi
+    if [ -f "$SCRIPT_DIR/git_ssh_setup.sh" ]; then
+        if gum confirm "Apakah Anda ingin mengonfigurasi identitas Git & generate SSH Key (GitHub)?"; then
+            bash "$SCRIPT_DIR/git_ssh_setup.sh"
         else
-            info "SSH Key ed25519 sudah tersedia di: $SSH_KEY"
-            if gum confirm "Tampilkan Public SSH Key Anda sekarang?"; then
-                gum style --border rounded --padding "1 2" --border-foreground 82 \
-                    "PUBLIC SSH KEY ANDA:" \
-                    "$(cat "$SSH_KEY.pub")"
-            fi
+            info "Melewati konfigurasi Git & SSH."
         fi
-    else
-        info "Melewati konfigurasi Git & SSH."
     fi
 }
 
