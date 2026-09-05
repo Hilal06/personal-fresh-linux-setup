@@ -1,6 +1,6 @@
-# Fedora KDE 44 - Personal Setup & Automation
+# Linux Setup - Personal Setup & Automation Suite
 
-Skrip otomasi modular untuk melakukan post-installation setup dan konfigurasi sistem operasi **Fedora KDE 44**. Dibuat untuk mempercepat proses bootstrap sistem dengan instalasi package RPM, Flatpak, dan konfigurasi terminal Zsh modern.
+Skrip otomasi modular untuk melakukan post-installation setup dan konfigurasi sistem operasi **Fedora Workstation** dan **Ubuntu (KDE / GNOME)**. Dibuat untuk mempercepat proses bootstrap sistem dengan instalasi package RPM/APT, Flatpak, dan konfigurasi terminal Zsh modern.
 
 ## 🚀 Fitur Utama
 - **Interaktif TUI**: Menggunakan [Charmbracelet Gum](https://github.com/charmbracelet/gum) untuk tampilan menu interaktif yang estetik.
@@ -24,7 +24,7 @@ Skrip otomasi modular untuk melakukan post-installation setup dan konfigurasi si
 
 ## 📁 Struktur Direktori
 ```text
-fedora-setup/
+linux-setup/
 ├── setup.sh                 # Skrip eksekusi utama (Main Entry Point)
 ├── README.md                # Dokumentasi proyek
 ├── scripts/

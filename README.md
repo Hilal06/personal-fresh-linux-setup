@@ -88,7 +88,7 @@ Jika Anda lebih suka mengkloning repositori sendiri:
 ```bash
 git clone https://github.com/Hilal06/personal-fresh-linux-setup.git
 cd personal-fresh-linux-setup
-./fedora-setup/setup.sh
+./linux-setup/setup.sh
 ```
 
 ---
@@ -157,7 +157,7 @@ cd personal-fresh-linux-setup
 
 ```text
 personal-fresh-linux-setup/
-├── fedora-setup/
+├── linux-setup/
 │   ├── setup.sh                 # 🚀 Entry point utama (Interactive TUI Launcher)
 │   ├── README.md                # Dokumentasi spesifik modul setup
 │   ├── scripts/

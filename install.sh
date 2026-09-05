@@ -52,13 +52,13 @@ else
 fi
 
 # 3. Jalankan skrip utama dengan TTY interaktif
-chmod +x "$INSTALL_DIR/fedora-setup/setup.sh" "$INSTALL_DIR/fedora-setup/scripts/"*.sh 2>/dev/null || true
+chmod +x "$INSTALL_DIR/linux-setup/setup.sh" "$INSTALL_DIR/linux-setup/scripts/"*.sh 2>/dev/null || true
 
 # Alihkan stdin ke terminal fisik (/dev/tty)
 exec </dev/tty
 
 # Eksekusi setup.sh dan tangkap status keluaran
-"$INSTALL_DIR/fedora-setup/setup.sh" "$@" || true
+"$INSTALL_DIR/linux-setup/setup.sh" "$@" || true
 
 # 4. Konfirmasi Pembersihan Direktori di Akhir Sesi
 echo ""

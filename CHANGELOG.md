@@ -4,6 +4,26 @@ Dokumentasi riwayat pembaruan dan otomasi commit proyek `personal-fresh-linux-se
 
 ---
 
+### 🚀 [2026-09-05 13:43:00] - refactor: rename directory fedora-setup to linux-setup and update all references
+
+- **Author**: Rifaul <rifaulhilal06@gmail.com>
+- **Branch**: main
+- **Highlights**:
+  - **Directory Rename**: Renamed core suite folder `fedora-setup/` to `linux-setup/` for distro-agnostic clarity.
+  - **Refactor Callers & Paths**: Updated entry point references in `install.sh`, `README.md`, `linux-setup/README.md`, and `AGENTS.md`.
+  - **CI/CD & Testing Matrix**: Updated `.github/workflows/ci.yml` and `.agents/skills/docker-sandbox-test/SKILL.md`.
+  - **Guard Hooks**: Updated `.agents/hooks.json` syntax validation hook.
+  - **Verification**: Fully verified with ShellCheck, `bash -n`, Fedora & Ubuntu Docker container tests, and Arch rejection test.
+- **Files Changed**:
+  - R fedora-setup/ -> linux-setup/
+  - M .agents/hooks.json
+  - M .agents/skills/docker-sandbox-test/SKILL.md
+  - M .github/workflows/ci.yml
+  - M AGENTS.md
+  - M README.md
+  - M install.sh
+  - M linux-setup/README.md
+
 ### 🚀 [2026-09-05 13:10:00] - feat(multi-distro): add Ubuntu support, purge Arch, add interactive dotfiles rollback & CI/CD pipeline
 
 - **Author**: Rifaul <rifaulhilal06@gmail.com>

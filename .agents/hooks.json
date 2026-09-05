@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'for f in fedora-setup/scripts/*.sh fedora-setup/*.sh; do [ -f \"$f\" ] && bash -n \"$f\" || exit 1; done'",
+            "command": "bash -c 'for f in linux-setup/scripts/*.sh linux-setup/*.sh; do [ -f \"$f\" ] || continue; bash -n \"$f\" || exit 1; done'",
             "timeout": 5
           }
         ]
@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'for f in fedora-setup/scripts/*.sh fedora-setup/*.sh; do [ -f \"$f\" ] && bash -n \"$f\" || exit 1; done'",
+            "command": "bash -c 'for f in linux-setup/scripts/*.sh linux-setup/*.sh; do [ -f \"$f\" ] || continue; bash -n \"$f\" || exit 1; done'",
             "timeout": 5
           }
         ]

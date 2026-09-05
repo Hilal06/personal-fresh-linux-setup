@@ -15,8 +15,8 @@ This skill provides automated workflows for testing installation scripts in isol
 1. **Dry-Run Syntax Verification**:
    Before launching any container test, always verify that all scripts pass syntax inspection:
    ```bash
-   bash -n fedora-setup/setup.sh
-   for s in fedora-setup/scripts/*.sh; do bash -n "$s"; done
+   bash -n linux-setup/setup.sh
+   for s in linux-setup/scripts/*.sh; do bash -n "$s"; done
    ```
 
 2. **Spinning Up a Clean Test Container**:
@@ -24,7 +24,7 @@ This skill provides automated workflows for testing installation scripts in isol
    ```bash
    docker run --rm -it \
      -v "$(pwd):/workspace:ro" \
-     -w /workspace/fedora-setup \
+     -w /workspace/linux-setup \
      fedora:latest \
      bash -c "echo '[SANDBOX TEST]' && bash -n setup.sh"
    ```
