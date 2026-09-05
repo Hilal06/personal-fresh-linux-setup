@@ -9,10 +9,11 @@
 [![Shell](https://img.shields.io/badge/Shell-Zsh%20%2B%20Starship-orange?style=for-the-badge&logo=gnu-bash&logoColor=white)](https://starship.rs/)
 [![CI / CD](https://img.shields.io/badge/CI%2FCD-Multi--Distro%20Tested-green?style=for-the-badge&logo=githubactions&logoColor=white)](.github/workflows/ci.yml)
 [![Interface](https://img.shields.io/badge/TUI-Charm%20Gum-pink?style=for-the-badge&logo=terminal&logoColor=white)](https://github.com/charmbracelet/gum)
+[![Language: ID | EN](https://img.shields.io/badge/Language-ID%20%7C%20EN-blueviolet?style=for-the-badge)](README.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
 <p align="center">
-  <b>Otomasi bootstrap sistem Linux modular berorientasi developer untuk Fedora Workstation dan Ubuntu (KDE / GNOME) dengan antarmuka TUI interaktif, akselerasi hardware, integrasi hardware ASUS ROG/TUF, dotfiles rollback instan, dan lingkungan terminal modern.</b>
+  <b>Otomasi bootstrap sistem Linux modular berorientasi developer untuk Fedora Workstation dan Ubuntu (KDE / GNOME) dengan antarmuka TUI interaktif, dukungan dwi-bahasa (English & Indonesian), akselerasi hardware, integrasi hardware ASUS ROG/TUF, dotfiles rollback instan, dan lingkungan terminal modern.</b>
 </p>
 
 ---
@@ -20,6 +21,27 @@
 </div>
 
 ## 🌌 Antarmuka Terminal & Menu Interaktif (TUI)
+
+### 🌐 1. Layar Pemilihan Bahasa (Language Selection Screen)
+
+Saat utilitas pertama kali dijalankan, sistem menyajikan layar pemilihan bahasa sebelum membuka dashboard utama:
+
+```text
+╭──────────────────────────────────────────────────────────────────╮
+│                   █░█ █ █░░ ▄▀█ █░░ █▀█ █▄▄                      │
+│                   █▀█ █ █▄▄ █▀█ █▄▄ █▄█ █▄█                      │
+│                                                                  │
+│                     Fresh Linux Setup Suite                      │
+│               Language Selection • Pemilihan Bahasa              │
+╰──────────────────────────────────────────────────────────────────╯
+ [↑/↓] Select / Pilih • [Enter] Confirm / Konfirmasi
+
+ Choose your preferred language / Pilih bahasa yang digunakan:
+ ❯ 🇮🇩  Bahasa Indonesia (Default)
+   🇬🇧  English (International)
+```
+
+### 🖥️ 2. Main Dashboard & System Overview
 
 ```text
 ╭──────────────────────────────────────────────────────────────────╮
@@ -41,11 +63,12 @@
    🎮  Setup & Konfigurasi ASUS ROG / TUF Utilities
    🔑  Setup Identitas Git & SSH Key Developer
    🩺  System Maintenance & Health Check (Rollback Dotfiles)
+   🌐  Ganti Bahasa / Change Language
    ────────────────────────────────────────────────────────────
-   🚪  Keluar / Selesai
+   🚪  Keluar / Selesai (Exit)
 ```
 
-### 🧭 Alur Sub-Menu & Tombol Kembali (Breadcrumb Navigation)
+### 🧭 3. Alur Sub-Menu & Tombol Kembali (Breadcrumb Navigation)
 
 Setiap sub-menu dilengkapi breadcrumb pelacak hierarki dan opsi eksplisit `[⬅️ Kembali ke Menu Utama]` di baris teratas:
 
@@ -122,7 +145,14 @@ cd personal-fresh-linux-setup
 
 ## 🚀 Fitur Unggulan (Core Features)
 
-### 🎨 1. Terminal Modern & Shell Workspace
+### 🌐 1. Dukungan Dwi-Bahasa Penuh (Bilingual English & Indonesian Support)
+- **Interactive Language Selector Screen**: Layar pemilihan bahasa elegan bertenaga Charm Gum yang menyambut pengguna sebelum masuk ke menu utama (`🇮🇩 Bahasa Indonesia` & `🇬🇧 English`).
+- **Real-Time Language Switcher**: Opsi `🌐 Ganti Bahasa / Change Language` di dashboard utama memungkinkan penggantian bahasa seketika kapan saja tanpa perlu me-restart skrip.
+- **Zero External Dependencies**: Sistem lokalisasi internal via helper function `_msg "Teks ID" "English text"` yang terintegrasi langsung di `env.sh`, tanpa membutuhkan gettext atau paket eksternal.
+- **Pre-configurable Environment Variable**: Otomasi atau pengguna non-interaktif dapat langsung menetapkan bahasa pilihan dengan `export SETUP_LANG=en` atau `export SETUP_LANG=id`.
+- **Konsistensi Seluruh Modul**: Seluruh sub-menu, breadcrumb, subtitle, panduan keybinding, dialog konfirmasi, ringkasan diagnostik, hingga konfirmasi cleanup di `install.sh` diterjemahkan secara rapi dan profesional.
+
+### 🎨 2. Terminal Modern & Shell Workspace
 - **Zsh & Starship Prompt**: Konfigurasi Zsh modern dengan integrasi tema [Starship](https://starship.rs/).
 - **Plugin Produktivitas**: `zsh-autosuggestions`, `zsh-syntax-highlighting`, dan `zsh-completions` terpasang otomatis.
 - **CLI Modern Tools**: Menggantikan perintah klasik dengan versi modern berkecepatan tinggi:
@@ -134,7 +164,7 @@ cd personal-fresh-linux-setup
 - **Instalasi FiraCode Nerd Font Otomatis**: Deteksi font sistem dan unduhan langsung versi rilis resmi GitHub.
 - **Auto-Config Font Terminal**: Otomatis menyetel font profil **KDE Konsole** (`kwriteconfig6/5`) dan **GNOME Terminal** (`gsettings`) ke `FiraCode Nerd Font 11` tanpa perlu klik manual.
 
-### 🧭 2. Dashboard Loop & Navigasi Interaktif Modern
+### 🧭 3. Dashboard Loop & Navigasi Interaktif Modern
 - **Persistent Navigation Loop**: `setup.sh` beroperasi dalam loop menu dinamis (`while true`) sehingga Anda bebas menjelajahi berbagai modul tanpa perlu memanggil ulang script dari awal.
 - **Dynamic System Status Badge**: Menampilkan ringkasan sistem real-time (Distro, Desktop Environment KDE/GNOME, Kernel, User, dan Hostname).
 - **Tombol Eksplisit `[⬅️ Kembali ke Menu Utama]`**: Diletakkan di baris pertama seluruh sub-menu agar pembatalan atau navigasi balik terasa intuitif.
@@ -142,7 +172,7 @@ cd personal-fresh-linux-setup
 - **Breadcrumb Navigation Indicator**: Menampilkan jejak posisi menu aktif (misal: `🧭 Menu Utama > Aplikasi Flatpak (Flathub)`).
 - **Modern Pointer & Styling**: Menggunakan cursor modern `❯ ` dengan pewarnaan modular untuk meningkatkan estetika visual.
 
-### 🛠️ 3. Otomasi Identitas Git & SSH Key Developer
+### 🛠️ 4. Otomasi Identitas Git & SSH Key Developer
 - **Git Identity Wizard**: Konfigurasi global nama (`user.name`), email (`user.email`), dan inisialisasi default branch `main`.
 - **Generator Kunci SSH `ed25519`**: Membuat private & public key dengan enkripsi modern dan hak akses aman (`chmod 700` & `chmod 600`).
 - **Integrasi Clipboard Otomatis**: Mendeteksi display server aktif dan langsung menyalin Public SSH Key ke clipboard:
@@ -150,12 +180,12 @@ cd personal-fresh-linux-setup
   - X11: via `xclip`
 - Tampilan Public Key berbingkai rapi dengan tautan langsung ke halaman pengaturan GitHub SSH Keys.
 
-### 🔄 4. Safe Dotfiles Backup & Timestamped Rollback
+### 🔄 5. Safe Dotfiles Backup & Timestamped Rollback
 - **Pencadangan Otomatis**: Setiap kali dotfiles (`~/.zshrc` dan `~/.config/starship.toml`) diperbarui, versi sebelumnya dicadangkan ke `~/.dotfiles_backup/` dengan format timestamp (`.backup.YYYYMMDDHHMMSS`).
 - **Rollback Interaktif**: Menu pemulihan pada `maintenance.sh` memindai seluruh snapshot backup yang tersedia dan memungkinkan Anda memilih versi spesifik untuk di-restore via Charm Gum.
 - **Safety Pre-Restore Snapshot**: Sebelum menimpa berkas konfigurasi aktif saat proses rollback, sistem membuat safety snapshot cadangan (`.pre_restore.YYYYMMDDHHMMSS`).
 
-### 💻 5. Integrasi Hardware Laptop ASUS ROG / TUF Gaming
+### 💻 6. Integrasi Hardware Laptop ASUS ROG / TUF Gaming
 - Otomatis memasang `asusctl`, `rog-control-center`, dan `supergfxctl` (pada Fedora) atau memberikan panduan PPA komunitas resmi (pada Ubuntu).
 - **80% Battery Care**: Mengaktifkan batas pengisian daya untuk memperpanjang usia baterai lithium-ion.
 - **GPU Switching & Fan Profiles**: Menambahkan alias terminal praktis:
@@ -163,14 +193,14 @@ cd personal-fresh-linux-setup
   - `asus-quiet`, `asus-bal`, `asus-perf`: Ganti profil kipas dan daya
   - `gpu-hybrid`, `gpu-igpu`, `gpu-dgpu`: Ganti mode grafis laptop
 
-### 🎛️ 6. Optimasi Sistem & Desktop Tuning
+### 🎛️ 7. Optimasi Sistem & Desktop Tuning
 - **Optimasi Kecepatan DNF**: Otomatis menyuntikkan `max_parallel_downloads=10`, `fastestmirror=True`, dan `defaultyes=True` pada `/etc/dnf/dnf.conf`.
 - **Tuning Kernel Sysctl**:
   - `vm.swappiness = 180` & `vm.vfs_cache_pressure = 50`: Memaksimalkan efisiensi kompresi memori ZRAM.
   - `fs.inotify.max_user_watches = 524288`: Mencegah crash file watcher pada Node.js, VSCode, Docker, dan Android Studio.
 - **Btrfs Assistant & Snapper**: Konfigurasi otomatis snapshot sistem root (`/`) dengan timer pembersihan berkala.
 
-### 📦 7. Ekosistem Aplikasi Native & Sandboxed
+### 📦 8. Ekosistem Aplikasi Native & Sandboxed
 - **Aplikasi Native (DNF / APT)**:
   - Google Antigravity (CLI `agy` & IDE Desktop)
   - Visual Studio Code (Microsoft Official Repositories)
@@ -179,7 +209,7 @@ cd personal-fresh-linux-setup
 - **Aplikasi Sandboxed (Flathub / Flatpak)**:
   - ONLYOFFICE Desktop Editors, Spotube (Spotify Client), Discord, Thunderbird Mail, VLC, Pika Backup, DBeaver, Bruno API Client, Logseq, LocalSend, Podman Desktop, Arduino IDE.
 
-### 🧪 8. Otomasi Pengujian, ShellCheck & CI/CD Pipeline
+### 🧪 9. Otomasi Pengujian, ShellCheck & CI/CD Pipeline
 - Pipeline GitHub Actions bertenaga container [`.github/workflows/ci.yml`](.github/workflows/ci.yml) yang berjalan pada setiap push & pull request:
   - **Static Analysis**: ShellCheck memeriksa kepatuhan standar POSIX/Bash (100% lolos tanpa peringatan).
   - **Syntax Verification**: Pengujian `bash -n` pada semua berkas skrip shell.
@@ -230,12 +260,13 @@ personal-fresh-linux-setup/
 
 Berikut adalah rangkuman pembaruan versi terbaru. Untuk riwayat selengkapnya, silakan baca berkas [CHANGELOG.md](CHANGELOG.md).
 
-> ### 🚀 `v2026.09.05` - Modern Interactive CLI Navigation & Sub-Menu Back Flow
-> - **Interactive Dashboard Loop**: `setup.sh` kini beroperasi dalam loop menu dinamis tanpa langsung keluar, dilengkapi badge status sistem dinamis (OS, Desktop Environment, Kernel, Host & User).
-> - **Tombol [Kembali ke Menu Utama]**: Menambahkan opsi kembali eksplisit di baris pertama seluruh modul sub-menu (`system_essentials.sh`, `rpm_apps.sh`, `flatpak_apps.sh`, `setup_terminal.sh`, `asus_setup.sh`, `git_ssh_setup.sh`, `maintenance.sh`).
-> - **Safe Esc & Cancel Handling**: Proteksi graceful cancel (`|| true`) di semua dialog `gum choose` sehingga penekanan tombol `Esc` tidak lagi mentrigger abort shell `set -e`.
-> - **Breadcrumb Navigasi & Modern Pointer**: Indikator lokasi menu hierarkis (`🧭 Menu Utama > Modul`), cursor modern `❯ `, serta bar panduan keybinding interaktif.
-> - **Linting ShellCheck 100% Clean**: Seluruh skrip shell lolos static analysis ShellCheck tanpa error maupun warning.
+> ### 🌐 `v2026.09.05` - Full Bilingual English & Indonesian TUI Support
+> - **Language Selector Screen**: Layar pemilihan bahasa interaktif sebelum masuk ke tampilan utama dashboard (`select_language()`).
+> - **In-Menu Language Switcher**: Opsi `🌐 Ganti Bahasa / Change Language` langsung di dashboard utama untuk pergantian bahasa instan.
+> - **Complete Module Localization**: Seluruh modul (`system_essentials`, `rpm_apps`, `flatpak_apps`, `setup_terminal`, `git_ssh_setup`, `asus_setup`, `maintenance`, `install.sh`) kini sepenuhnya bilingual (Bahasa Indonesia & English).
+> - **Lightweight `_msg()` Translation Engine**: Helper terpadu di `env.sh` dengan persistensi variabel `SETUP_LANG` antar-sesi proses.
+> - **Interactive Navigation & Sub-Menu Back Flow**: Dashboard loop interaktif, tombol `[Kembali ke Menu Utama]`, penanganan tombol `Esc` aman (`|| true`), dan breadcrumb navigation.
+> - **Linting ShellCheck 100% Clean**: Seluruh 12 skrip shell lolos static analysis ShellCheck tanpa error maupun warning.
 
 ---
 

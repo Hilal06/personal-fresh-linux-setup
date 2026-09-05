@@ -12,25 +12,25 @@ CONFIGS_DIR="$SCRIPT_DIR/../configs"
 # Load environment & helper functions (info, success, warn, error, gum)
 source "$SCRIPT_DIR/env.sh"
 
-render_breadcrumb "Setup Shell & Terminal Workspace"
+render_breadcrumb "$(_msg "Setup Shell & Terminal Workspace" "Shell & Terminal Workspace Setup")"
 
 gum style \
     --foreground 45 --border-foreground 45 --border rounded \
     --align center --width 64 --padding "1 2" --bold \
-    "TERMINAL & SHELL WORKSPACE" "Zsh, Starship, FiraCode Nerd Font & Dotfiles"
+    "TERMINAL & SHELL WORKSPACE" "$(_msg "Zsh, Starship, FiraCode Nerd Font & Dotfiles" "Zsh, Starship, FiraCode Nerd Font & Dotfiles")"
 
 echo ""
 ACTION=$(gum choose \
     --cursor="❯ " \
     --cursor.foreground="45" \
-    --header="Pilih mode setup terminal:" \
-    "🚀  Jalankan Setup Lengkap (CLI Tools, Font, Plugins, Dotfiles)" \
-    "🎨  Hanya Terapkan Dotfiles (~/.zshrc & starship.toml)" \
-    "🔤  Hanya Install FiraCode Nerd Font & Konfigurasi Profil Terminal" \
-    "⬅️   [Kembali ke Menu Utama]" || true)
+    --header="$(_msg "Pilih mode setup terminal:" "Select terminal setup mode:")" \
+    "🚀  $(_msg "Jalankan Setup Lengkap (CLI Tools, Font, Plugins, Dotfiles)" "Run Full Setup (CLI Tools, Font, Plugins, Dotfiles)")" \
+    "🎨  $(_msg "Hanya Terapkan Dotfiles (~/.zshrc & starship.toml)" "Apply Dotfiles Only (~/.zshrc & starship.toml)")" \
+    "🔤  $(_msg "Hanya Install FiraCode Nerd Font & Konfigurasi Profil Terminal" "Install FiraCode Nerd Font & Configure Terminal Profile Only")" \
+    "$(_msg "⬅️   [Kembali ke Menu Utama]" "⬅️   [Back to Main Menu]")" || true)
 
-if [ -z "$ACTION" ] || [[ "$ACTION" == *"Kembali ke Menu Utama"* ]]; then
-    info "Kembali ke Menu Utama..."
+if [ -z "$ACTION" ] || [[ "$ACTION" == *"Kembali"* ]] || [[ "$ACTION" == *"Back"* ]]; then
+    info "$(_msg "Kembali ke Menu Utama..." "Returning to Main Menu...")"
     exit 0
 fi
 
@@ -255,7 +255,7 @@ set_default_shell() {
     ZSH_PATH="$(command -v zsh || true)"
 
     if [ -n "$ZSH_PATH" ] && [ "$SHELL" != "$ZSH_PATH" ]; then
-        if gum confirm "Apakah Anda ingin mengubah default shell pengguna ($USER) ke Zsh?"; then
+        if gum confirm "$(_msg "Apakah Anda ingin mengubah default shell pengguna ($USER) ke Zsh?" "Do you want to change default shell for user ($USER) to Zsh?")"; then
             info "Mengubah default shell ke $ZSH_PATH..."
             sudo chsh -s "$ZSH_PATH" "$USER" || warn "Gagal menjalankan chsh otomatis. Silakan jalankan 'chsh -s $(which zsh)' manual."
             success "Default shell berhasil diubah ke Zsh."
@@ -270,7 +270,7 @@ set_default_shell() {
 # 7. Konfigurasi Git Identity & SSH Key Generator
 configure_git_and_ssh() {
     if [ -f "$SCRIPT_DIR/git_ssh_setup.sh" ]; then
-        if gum confirm "Apakah Anda ingin mengonfigurasi identitas Git & generate SSH Key (GitHub)?"; then
+        if gum confirm "$(_msg "Apakah Anda ingin mengonfigurasi identitas Git & generate SSH Key (GitHub)?" "Do you want to configure Git identity & generate SSH Key (GitHub)?")"; then
             bash "$SCRIPT_DIR/git_ssh_setup.sh"
         else
             info "Melewati konfigurasi Git & SSH."
@@ -280,12 +280,12 @@ configure_git_and_ssh() {
 
 # Eksekusi Berdasarkan Pilihan
 case "$ACTION" in
-    "🚀  Jalankan Setup Lengkap"*)
+    *"Setup Lengkap"*|*"Full Setup"*)
         install_cli_tools
         install_firacode_nerd_font
         setup_plugins
 
-        if gum confirm "Terapkan file konfigurasi dotfiles (starship.toml & .zshrc)?"; then
+        if gum confirm "$(_msg "Terapkan file konfigurasi dotfiles (starship.toml & .zshrc)?" "Apply dotfiles configuration files (starship.toml & .zshrc)?")"; then
             deploy_starship_config
             deploy_zshrc_config
         else
@@ -296,18 +296,18 @@ case "$ACTION" in
         set_default_shell
         ;;
 
-    "🎨  Hanya Terapkan Dotfiles"*)
+    *"Dotfiles"*)
         deploy_starship_config
         deploy_zshrc_config
         ;;
 
-    "🔤  Hanya Install FiraCode"*)
+    *"FiraCode"*)
         install_firacode_nerd_font
         ;;
 esac
 
 echo ""
 success "============================================================"
-success " Setup Terminal & Shell Modern Selesai!"
-success " Silakan restart terminal atau jalankan: exec zsh"
+success "$(_msg " Setup Terminal & Shell Modern Selesai!" " Terminal & Shell Modern Setup Completed!")"
+success "$(_msg " Silakan restart terminal atau jalankan: exec zsh" " Please restart your terminal or run: exec zsh")"
 success "============================================================"

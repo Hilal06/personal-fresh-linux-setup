@@ -3,6 +3,7 @@
 Skrip otomasi modular untuk melakukan post-installation setup dan konfigurasi sistem operasi **Fedora Workstation** dan **Ubuntu (KDE / GNOME)**. Dibuat untuk mempercepat proses bootstrap sistem dengan instalasi package RPM/APT, Flatpak, dan konfigurasi terminal Zsh modern.
 
 ## 🚀 Fitur Utama
+- **Dukungan Dwi-Bahasa (Bilingual ID & EN)**: Dilengkapi layar pemilihan bahasa (`select_language()`) sebelum masuk dashboard utama, in-menu language switcher, dan lokalisasi menyeluruh ke Bahasa Indonesia & English di setiap modul.
 - **Interaktif TUI Dashboard Loop**: Menggunakan [Charmbracelet Gum](https://github.com/charmbracelet/gum) untuk tampilan menu interaktif yang estetik, berjalan dalam dashboard loop persisten dengan dynamic system status badge, indikator breadcrumb, tombol `[⬅️ Kembali ke Menu Utama]` di setiap sub-menu, dan safe `Esc` cancel handling.
 - **Modular & Fleksibel**: Skrip dipecah menjadi beberapa bagian (Environment, System Essentials & Codecs, Zsh, RPM Apps, Flatpak Apps).
 - **Environment & Repositori**: Menambahkan RPM Fusion (Free, Non-Free, & Tainted) serta Flathub secara otomatis.

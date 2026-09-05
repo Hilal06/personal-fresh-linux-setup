@@ -9,24 +9,24 @@ set -e
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 source "$SCRIPT_DIR/env.sh"
 
-render_breadcrumb "Git Identity & SSH Key Setup"
+render_breadcrumb "$(_msg "Git Identity & SSH Key Setup" "Git Identity & SSH Key Setup")"
 
 gum style \
     --foreground 214 --border-foreground 214 --border rounded \
     --align center --width 64 --padding "1 2" --bold \
-    "GIT & SSH DEVELOPER SETUP" "Global Identity & Ed25519 Authentication"
+    "GIT & SSH DEVELOPER SETUP" "$(_msg "Identitas Global & Autentikasi Ed25519" "Global Identity & Ed25519 Authentication")"
 
 echo ""
 ACTION=$(gum choose \
     --cursor="❯ " \
     --cursor.foreground="214" \
-    --header="Pilih tindakan Git & SSH:" \
-    "⚡  Konfigurasi Identitas Git & Generate SSH Key" \
-    "📋  Tampilkan & Salin Public SSH Key yang Ada" \
-    "⬅️   [Kembali ke Menu Utama]" || true)
+    --header="$(_msg "Pilih tindakan Git & SSH:" "Select Git & SSH action:")" \
+    "⚡  $(_msg "Konfigurasi Identitas Git & Generate SSH Key" "Configure Git Identity & Generate SSH Key")" \
+    "📋  $(_msg "Tampilkan & Salin Public SSH Key yang Ada" "Display & Copy Existing Public SSH Key")" \
+    "$(_msg "⬅️   [Kembali ke Menu Utama]" "⬅️   [Back to Main Menu]")" || true)
 
-if [ -z "$ACTION" ] || [[ "$ACTION" == *"Kembali ke Menu Utama"* ]]; then
-    info "Kembali ke Menu Utama..."
+if [ -z "$ACTION" ] || [[ "$ACTION" == *"Kembali"* ]] || [[ "$ACTION" == *"Back"* ]]; then
+    info "$(_msg "Kembali ke Menu Utama..." "Returning to Main Menu...")"
     exit 0
 fi
 
@@ -142,13 +142,13 @@ configure_ssh_key() {
 }
 
 case "$ACTION" in
-    "⚡  Konfigurasi Identitas Git"*)
+    *"Konfigurasi Identitas Git"*|*"Configure Git Identity"*)
         configure_git_identity
         configure_ssh_key
         echo ""
-        success "Konfigurasi Git & SSH selesai."
+        success "$(_msg "Konfigurasi Git & SSH selesai." "Git & SSH configuration completed.")"
         ;;
-    "📋  Tampilkan & Salin Public SSH Key"*)
+    *"Tampilkan & Salin"*|*"Display & Copy"*)
         show_existing_public_key
         ;;
 esac

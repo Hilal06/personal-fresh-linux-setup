@@ -10,24 +10,24 @@ set -e
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 source "$SCRIPT_DIR/env.sh"
 
-render_breadcrumb "ASUS ROG / TUF Gaming Utility"
+render_breadcrumb "$(_msg "ASUS ROG / TUF Gaming Utility" "ASUS ROG / TUF Gaming Utility")"
 
 gum style \
     --foreground 196 --border-foreground 196 --border rounded \
     --align center --width 64 --padding "1 2" --bold \
-    "ROG & TUF GAMING UTILITY" "ASUS Power, GPU MUX Switch & Battery Care"
+    "ROG & TUF GAMING UTILITY" "$(_msg "ASUS Power, GPU MUX Switch & Perawatan Baterai" "ASUS Power, GPU MUX Switch & Battery Care")"
 
 echo ""
 ACTION=$(gum choose \
     --cursor="❯ " \
     --cursor.foreground="196" \
-    --header="Pilih tindakan utilitas ASUS ROG / TUF:" \
-    "⚡  Setup Lengkap (Install Driver, Background Services & Konfigurasi)" \
-    "⚙️   Hanya Buka Pengaturan (Battery Limit, Profil Daya, GPU Switcher)" \
-    "⬅️   [Kembali ke Menu Utama]" || true)
+    --header="$(_msg "Pilih tindakan utilitas ASUS ROG / TUF:" "Select ASUS ROG / TUF action:")" \
+    "⚡  $(_msg "Setup Lengkap (Install Driver, Background Services & Konfigurasi)" "Full Setup (Install Drivers, Background Services & Configure)")" \
+    "⚙️   $(_msg "Hanya Buka Pengaturan (Battery Limit, Profil Daya, GPU Switcher)" "Open Settings Only (Battery Limit, Power Profile, GPU Switcher)")" \
+    "$(_msg "⬅️   [Kembali ke Menu Utama]" "⬅️   [Back to Main Menu]")" || true)
 
-if [ -z "$ACTION" ] || [[ "$ACTION" == *"Kembali ke Menu Utama"* ]]; then
-    info "Kembali ke Menu Utama..."
+if [ -z "$ACTION" ] || [[ "$ACTION" == *"Kembali"* ]] || [[ "$ACTION" == *"Back"* ]]; then
+    info "$(_msg "Kembali ke Menu Utama..." "Returning to Main Menu...")"
     exit 0
 fi
 
@@ -109,21 +109,21 @@ enable_asus_services() {
 # 4. Konfigurasi Interaktif Fitur ASUS
 configure_asus_settings() {
     echo ""
-    gum style --foreground 245 " [↑/↓] Navigasi • [Spasi] Pilih / Batal Centang • [Enter] Konfirmasi • [Esc] Kembali"
+    gum style --foreground 245 "$(_msg " [↑/↓] Navigasi • [Spasi] Pilih / Batal Centang • [Enter] Konfirmasi • [Esc] Kembali" " [↑/↓] Navigate • [Space] Toggle Selection • [Enter] Confirm • [Esc] Back")"
 
     local CONFIG_CHOICES
     CONFIG_CHOICES=$(gum choose --no-limit \
         --cursor="❯ " \
         --cursor.foreground="196" \
         --selected.foreground="82" \
-        "⬅️   [Kembali]" \
-        "Set Batas Pengisian Baterai (Battery Health / Care Limit)" \
-        "Set Default Power Profile (Quiet / Balanced / Performance)" \
-        "Set Graphics / GPU Mode Switcher (supergfxctl)" \
-        "Set Kecerahan Keyboard Backlight" || true)
+        "$(_msg "⬅️   [Kembali]" "⬅️   [Back]")" \
+        "$(_msg "Set Batas Pengisian Baterai (Battery Health / Care Limit)" "Set Battery Charge Limit (Battery Health / Care Limit)")" \
+        "$(_msg "Set Default Power Profile (Quiet / Balanced / Performance)" "Set Default Power Profile (Quiet / Balanced / Performance)")" \
+        "$(_msg "Set Graphics / GPU Mode Switcher (supergfxctl)" "Set Graphics / GPU Mode Switcher (supergfxctl)")" \
+        "$(_msg "Set Kecerahan Keyboard Backlight" "Set Keyboard Backlight Brightness")" || true)
 
-    if [ -z "$CONFIG_CHOICES" ] || [[ "$CONFIG_CHOICES" == *"Kembali"* ]]; then
-        info "Kembali..."
+    if [ -z "$CONFIG_CHOICES" ] || [[ "$CONFIG_CHOICES" == *"Kembali"* ]] || [[ "$CONFIG_CHOICES" == *"Back"* ]]; then
+        info "$(_msg "Kembali..." "Back...")"
         return 0
     fi
 
@@ -132,7 +132,7 @@ configure_asus_settings() {
     for opt in "${SELECTED_CONFIGS[@]}"; do
         [ -z "$opt" ] && continue
         case "$opt" in
-            "Set Batas Pengisian Baterai"*)
+            *"Batas Pengisian Baterai"*|*"Battery Charge Limit"*)
                 echo ""
                 local CURRENT_LIMIT
                 CURRENT_LIMIT="$(asusctl battery info 2>/dev/null | grep -o '[0-9]\+%' || cat /sys/class/power_supply/BAT*/charge_control_end_threshold 2>/dev/null || echo 'Tidak diketahui')"
@@ -257,21 +257,21 @@ configure_asus_settings() {
 
 # Eksekusi Berdasarkan Pilihan
 case "$ACTION" in
-    "⚡  Setup Lengkap"*)
+    *"Setup Lengkap"*|*"Full Setup"*)
         detect_asus_hardware
         install_asus_packages
         enable_asus_services
-        if gum confirm "Apakah Anda ingin mengatur konfigurasi profil & baterai ASUS sekarang?"; then
+        if gum confirm "$(_msg "Apakah Anda ingin mengatur konfigurasi profil & baterai ASUS sekarang?" "Do you want to configure ASUS profiles & battery now?")"; then
             configure_asus_settings
         fi
         ;;
-    "⚙️   Hanya Buka Pengaturan"*)
+    *"Hanya Buka Pengaturan"*|*"Open Settings Only"*)
         configure_asus_settings
         ;;
 esac
 
 echo ""
 success "============================================================"
-success " Setup & Konfigurasi ASUS ROG / TUF Selesai!"
-success " GUI ROG Control Center dapat dibuka dengan: rog-control-center"
+success "$(_msg " Setup & Konfigurasi ASUS ROG / TUF Selesai!" " ASUS ROG / TUF Setup & Configuration Completed!")"
+success "$(_msg " GUI ROG Control Center dapat dibuka dengan: rog-control-center" " ROG Control Center GUI can be launched via: rog-control-center")"
 success "============================================================"

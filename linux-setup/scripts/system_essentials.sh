@@ -3,31 +3,31 @@ set -e
 
 source "$(dirname "$0")/env.sh"
 
-render_breadcrumb "System Essentials & Media Codecs"
+render_breadcrumb "$(_msg "System Essentials & Media Codecs" "System Essentials & Media Codecs")"
 
 gum style \
     --foreground 141 --border-foreground 141 --border rounded \
     --align center --width 64 --padding "1 2" --bold \
-    "SYSTEM ESSENTIALS & CODECS" "Multimedia, Btrfs Snapshots & Desktop Optimization"
+    "SYSTEM ESSENTIALS & CODECS" "$(_msg "Multimedia, Btrfs Snapshots & Optimasi Desktop" "Multimedia, Btrfs Snapshots & Desktop Optimization")"
 
 echo ""
-gum style --foreground 245 " [↑/↓] Navigasi • [Spasi] Pilih / Batal Centang • [Enter] Konfirmasi • [Esc] Kembali"
+gum style --foreground 245 "$(_msg " [↑/↓] Navigasi • [Spasi] Pilih / Batal Centang • [Enter] Konfirmasi • [Esc] Kembali" " [↑/↓] Navigate • [Space] Toggle Selection • [Enter] Confirm • [Esc] Back")"
 
 CHOICES=$(gum choose --no-limit \
     --cursor="❯ " \
     --cursor.foreground="141" \
     --selected.foreground="82" \
-    "⬅️   [Kembali ke Menu Utama]" \
-    "Multimedia Codecs Lengkap (FFmpeg, GStreamer, libdvdcss, Audio/Video Extras)" \
-    "Hardware Video Acceleration / Drivers (VA-API, Mesa Freeworld, Intel/AMD)" \
-    "System Utilities & Compression (p7zip, unrar, tar, rsync, lshw, pciutils)" \
-    "KDE Plasma Enhancements (KDE Connect, Flatpak KCM integration)" \
-    "Btrfs Assistant & Snapper (GUI Snapshot, Maintenance, Subvolume Management)" \
-    "System Performance & Thermal Tuning (thermald, tuned, preload)" \
-    "Kernel & Sysctl Desktop Tuning (ZRAM Swappiness, File Watcher Handles)" || true)
+    "$(_msg "⬅️   [Kembali ke Menu Utama]" "⬅️   [Back to Main Menu]")" \
+    "$(_msg "Multimedia Codecs Lengkap (FFmpeg, GStreamer, libdvdcss, Audio/Video Extras)" "Complete Multimedia Codecs (FFmpeg, GStreamer, libdvdcss, Audio/Video Extras)")" \
+    "$(_msg "Hardware Video Acceleration / Drivers (VA-API, Mesa Freeworld, Intel/AMD)" "Hardware Video Acceleration / Drivers (VA-API, Mesa Freeworld, Intel/AMD)")" \
+    "$(_msg "System Utilities & Compression (p7zip, unrar, tar, rsync, lshw, pciutils)" "System Utilities & Compression (p7zip, unrar, tar, rsync, lshw, pciutils)")" \
+    "$(_msg "KDE Plasma Enhancements (KDE Connect, Flatpak KCM integration)" "KDE Plasma Enhancements (KDE Connect, Flatpak KCM integration)")" \
+    "$(_msg "Btrfs Assistant & Snapper (GUI Snapshot, Maintenance, Subvolume Management)" "Btrfs Assistant & Snapper (GUI Snapshot, Maintenance, Subvolume Management)")" \
+    "$(_msg "System Performance & Thermal Tuning (thermald, tuned, preload)" "System Performance & Thermal Tuning (thermald, tuned, preload)")" \
+    "$(_msg "Kernel & Sysctl Desktop Tuning (ZRAM Swappiness, File Watcher Handles)" "Kernel & Sysctl Desktop Tuning (ZRAM Swappiness, File Watcher Handles)")" || true)
 
-if [ -z "$CHOICES" ] || [[ "$CHOICES" == *"Kembali ke Menu Utama"* ]]; then
-    info "Kembali ke Menu Utama..."
+if [ -z "$CHOICES" ] || [[ "$CHOICES" == *"Kembali"* ]] || [[ "$CHOICES" == *"Back"* ]]; then
+    info "$(_msg "Kembali ke Menu Utama..." "Returning to Main Menu...")"
     exit 0
 fi
 
@@ -36,7 +36,7 @@ mapfile -t SELECTED_OPTS <<< "$CHOICES"
 for choice in "${SELECTED_OPTS[@]}"; do
     [ -z "$choice" ] && continue
     case "$choice" in
-        "Multimedia Codecs Lengkap"*)
+        *"Multimedia Codecs"*)
             info "Menginstall Multimedia Codecs Lengkap..."
             if [ "$DISTRO_TYPE" = "fedora" ]; then
                 gum spin --spinner dot --title "Mengganti ffmpeg-free dengan full FFmpeg (RPM Fusion)..." -- \
@@ -176,4 +176,4 @@ SYSCTL_EOF
 done
 
 echo ""
-success "Pemasangan System Essentials & Media Codecs selesai."
+success "$(_msg "Pemasangan System Essentials & Media Codecs selesai." "System Essentials & Media Codecs installation completed.")"

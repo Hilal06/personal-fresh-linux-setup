@@ -3,21 +3,21 @@ set -e
 
 source "$(dirname "$0")/env.sh"
 
-render_breadcrumb "Aplikasi Sistem Native (DNF / APT)"
+render_breadcrumb "$(_msg "Aplikasi Sistem Native (DNF / APT)" "Native System Apps (DNF / APT)")"
 
 gum style \
     --foreground 33 --border-foreground 33 --border rounded \
     --align center --width 64 --padding "1 2" --bold \
-    "NATIVE APPLICATION REPOSITORY" "Developer Tools, Antigravity, VSCode, Docker & Utilities"
+    "NATIVE APPLICATION REPOSITORY" "$(_msg "Developer Tools, Antigravity, VSCode, Docker & Utilitas" "Developer Tools, Antigravity, VSCode, Docker & Utilities")"
 
 echo ""
-gum style --foreground 245 " [↑/↓] Navigasi • [Spasi] Pilih / Batal Centang • [Enter] Konfirmasi • [Esc] Kembali"
+gum style --foreground 245 "$(_msg " [↑/↓] Navigasi • [Spasi] Pilih / Batal Centang • [Enter] Konfirmasi • [Esc] Kembali" " [↑/↓] Navigate • [Space] Toggle Selection • [Enter] Confirm • [Esc] Back")"
 
 CHOICES=$(gum choose --no-limit \
     --cursor="❯ " \
     --cursor.foreground="33" \
     --selected.foreground="82" \
-    "⬅️   [Kembali ke Menu Utama]" \
+    "$(_msg "⬅️   [Kembali ke Menu Utama]" "⬅️   [Back to Main Menu]")" \
     "Development Tools (gcc, make, git, curl, wget, cmake)" \
     "Google Antigravity CLI (agy)" \
     "Google Antigravity IDE (Desktop Application)" \
@@ -29,8 +29,8 @@ CHOICES=$(gum choose --no-limit \
     "EasyEffects & Plugins (Audio Enhancer / Equalizer)" \
     "Flatseal (Flatpak Permissions Manager)" || true)
 
-if [ -z "$CHOICES" ] || [[ "$CHOICES" == *"Kembali ke Menu Utama"* ]]; then
-    info "Kembali ke Menu Utama..."
+if [ -z "$CHOICES" ] || [[ "$CHOICES" == *"Kembali"* ]] || [[ "$CHOICES" == *"Back"* ]]; then
+    info "$(_msg "Kembali ke Menu Utama..." "Returning to Main Menu...")"
     exit 0
 fi
 
@@ -175,4 +175,4 @@ DESKTOP_EOF
     esac
 done
 
-success "Instalasi aplikasi native selesai."
+success "$(_msg "Instalasi aplikasi native selesai." "Native applications installation completed.")"

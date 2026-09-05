@@ -17,11 +17,24 @@ success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 error() { echo -e "${RED}[ERROR]${NC} $1"; exit 1; }
 
+# Language / i18n helper (Default: id)
+export SETUP_LANG="${SETUP_LANG:-id}"
+
+_msg() {
+    if [ "$SETUP_LANG" = "en" ]; then
+        echo "$2"
+    else
+        echo "$1"
+    fi
+}
+
 # Helper untuk merender breadcrumbs navigasi modern TUI
 render_breadcrumb() {
     local PATH_STR="$1"
+    local MAIN_LABEL
+    MAIN_LABEL="$(_msg "Menu Utama" "Main Menu")"
     echo ""
-    gum style --foreground 240 "🧭 $PATH_STR"
+    gum style --foreground 240 "🧭 $MAIN_LABEL > $PATH_STR"
 }
 
 # Fallback untuk environment root / container minimal tanpa command sudo

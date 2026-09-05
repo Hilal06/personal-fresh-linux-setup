@@ -61,22 +61,36 @@ exec </dev/tty
 "$INSTALL_DIR/linux-setup/setup.sh" "$@" || true
 
 # 4. Konfirmasi Pembersihan Direktori di Akhir Sesi
+[ -f /tmp/.setup_lang ] && SETUP_LANG="$(cat /tmp/.setup_lang 2>/dev/null)" && rm -f /tmp/.setup_lang
+
+CLEAN_PROMPT="Apakah Anda ingin menghapus direktori repositori utilitas ini ($INSTALL_DIR)?"
+CLEAN_INFO="[INFO] Membersihkan direktori instalasi..."
+CLEAN_SUCCESS="✓ Direktori lokal berhasil dibersihkan."
+CLEAN_RETAIN="ℹ Direktori tetap disimpan di: $INSTALL_DIR"
+
+if [ "${SETUP_LANG:-}" = "en" ]; then
+    CLEAN_PROMPT="Do you want to remove this utility repository directory ($INSTALL_DIR)?"
+    CLEAN_INFO="[INFO] Cleaning up installation directory..."
+    CLEAN_SUCCESS="✓ Local directory successfully cleaned up."
+    CLEAN_RETAIN="ℹ Directory retained at: $INSTALL_DIR"
+fi
+
 echo ""
 if command -v gum &>/dev/null; then
-    if gum confirm "Apakah Anda ingin menghapus direktori repositori utilitas ini ($INSTALL_DIR)?"; then
-        echo "[INFO] Membersihkan direktori instalasi..."
+    if gum confirm "$CLEAN_PROMPT"; then
+        echo "$CLEAN_INFO"
         rm -rf "$INSTALL_DIR"
-        gum style --foreground 82 --bold "✓ Direktori lokal berhasil dibersihkan."
+        gum style --foreground 82 --bold "$CLEAN_SUCCESS"
     else
-        gum style --foreground 39 "ℹ Direktori tetap disimpan di: $INSTALL_DIR"
+        gum style --foreground 39 "$CLEAN_RETAIN"
     fi
 else
-    read -r -p "Apakah Anda ingin menghapus direktori repositori utilitas ini? (y/N): " CLEAN_CHOICE
+    read -r -p "$CLEAN_PROMPT (y/N): " CLEAN_CHOICE
     if [[ "$CLEAN_CHOICE" =~ ^[Yy]$ ]]; then
-        echo "[INFO] Membersihkan direktori instalasi..."
+        echo "$CLEAN_INFO"
         rm -rf "$INSTALL_DIR"
-        echo "✓ Direktori lokal berhasil dibersihkan."
+        echo "$CLEAN_SUCCESS"
     else
-        echo "ℹ Direktori tetap disimpan di: $INSTALL_DIR"
+        echo "$CLEAN_RETAIN"
     fi
 fi

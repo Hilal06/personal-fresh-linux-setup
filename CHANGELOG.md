@@ -4,6 +4,24 @@ Dokumentasi riwayat pembaruan dan otomasi commit proyek `personal-fresh-linux-se
 
 ---
 
+### 🚀 [2026-09-05 15:24:08] - feat(i18n): add bilingual English and Indonesian support with interactive language selector
+
+- **Author**: Rifaul <rifaulhilal06@gmail.com>
+- **Branch**: main
+- **Files Changed**:
+  -  M README.md
+  -  M install.sh
+  -  M linux-setup/README.md
+  -  M linux-setup/scripts/asus_setup.sh
+  -  M linux-setup/scripts/env.sh
+  -  M linux-setup/scripts/flatpak_apps.sh
+  -  M linux-setup/scripts/git_ssh_setup.sh
+  -  M linux-setup/scripts/maintenance.sh
+  -  M linux-setup/scripts/rpm_apps.sh
+  -  M linux-setup/scripts/setup_terminal.sh
+  -  M linux-setup/scripts/system_essentials.sh
+  -  M linux-setup/setup.sh
+
 ### 🚀 [2026-09-05 14:55:35] - docs: rework README and update changelog with interactive TUI dashboard & back flow
 
 - **Author**: Rifaul <rifaulhilal06@gmail.com>

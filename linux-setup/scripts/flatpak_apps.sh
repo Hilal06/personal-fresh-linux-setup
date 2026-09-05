@@ -3,21 +3,21 @@ set -e
 
 source "$(dirname "$0")/env.sh"
 
-render_breadcrumb "Aplikasi Flatpak (Flathub)"
+render_breadcrumb "$(_msg "Aplikasi Flatpak (Flathub)" "Flatpak Applications (Flathub)")"
 
 gum style \
     --foreground 69 --border-foreground 69 --border rounded \
     --align center --width 64 --padding "1 2" --bold \
-    "FLATHUB APPLICATION STORE" "Sandboxed Desktop Applications & Productivity"
+    "FLATHUB APPLICATION STORE" "$(_msg "Aplikasi Desktop Terisolasi & Produktivitas" "Sandboxed Desktop Applications & Productivity")"
 
 echo ""
-gum style --foreground 245 " [↑/↓] Navigasi • [Spasi] Pilih / Batal Centang • [Enter] Konfirmasi • [Esc] Kembali"
+gum style --foreground 245 "$(_msg " [↑/↓] Navigasi • [Spasi] Pilih / Batal Centang • [Enter] Konfirmasi • [Esc] Kembali" " [↑/↓] Navigate • [Space] Toggle Selection • [Enter] Confirm • [Esc] Back")"
 
 CHOICES=$(gum choose --no-limit \
     --cursor="❯ " \
     --cursor.foreground="69" \
     --selected.foreground="82" \
-    "⬅️   [Kembali ke Menu Utama]" \
+    "$(_msg "⬅️   [Kembali ke Menu Utama]" "⬅️   [Back to Main Menu]")" \
     "Google Chrome" \
     "ONLYOFFICE Desktop Editors" \
     "Thunderbird Mail ESR" \
@@ -32,8 +32,8 @@ CHOICES=$(gum choose --no-limit \
     "Podman Desktop" \
     "Arduino IDE" || true)
 
-if [ -z "$CHOICES" ] || [[ "$CHOICES" == *"Kembali ke Menu Utama"* ]]; then
-    info "Kembali ke Menu Utama..."
+if [ -z "$CHOICES" ] || [[ "$CHOICES" == *"Kembali"* ]] || [[ "$CHOICES" == *"Back"* ]]; then
+    info "$(_msg "Kembali ke Menu Utama..." "Returning to Main Menu...")"
     exit 0
 fi
 
@@ -97,4 +97,4 @@ for choice in "${SELECTED_APPS[@]}"; do
     esac
 done
 
-success "Instalasi aplikasi Flatpak selesai."
+success "$(_msg "Instalasi aplikasi Flatpak selesai." "Flatpak applications installation completed.")"
