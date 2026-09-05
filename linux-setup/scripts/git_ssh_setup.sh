@@ -9,13 +9,52 @@ set -e
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 source "$SCRIPT_DIR/env.sh"
 
-echo ""
+render_breadcrumb "Git Identity & SSH Key Setup"
+
 gum style \
     --foreground 214 --border-foreground 214 --border rounded \
     --align center --width 64 --padding "1 2" --bold \
     "GIT & SSH DEVELOPER SETUP" "Global Identity & Ed25519 Authentication"
 
-# 1. Konfigurasi Identitas Git
+echo ""
+ACTION=$(gum choose \
+    --cursor="❯ " \
+    --cursor.foreground="214" \
+    --header="Pilih tindakan Git & SSH:" \
+    "⚡  Konfigurasi Identitas Git & Generate SSH Key" \
+    "📋  Tampilkan & Salin Public SSH Key yang Ada" \
+    "⬅️   [Kembali ke Menu Utama]" || true)
+
+if [ -z "$ACTION" ] || [[ "$ACTION" == *"Kembali ke Menu Utama"* ]]; then
+    info "Kembali ke Menu Utama..."
+    exit 0
+fi
+
+# Fungsi Tampilkan Public Key
+show_existing_public_key() {
+    local SSH_KEY="$HOME/.ssh/id_ed25519.pub"
+    if [ ! -f "$SSH_KEY" ]; then
+        SSH_KEY="$HOME/.ssh/id_rsa.pub"
+    fi
+
+    if [ -f "$SSH_KEY" ]; then
+        local PUB_CONTENT
+        PUB_CONTENT="$(cat "$SSH_KEY")"
+        if command -v wl-copy &>/dev/null; then
+            echo "$PUB_CONTENT" | wl-copy 2>/dev/null || true
+            info "✓ Public Key ($SSH_KEY) disalin ke Clipboard (Wayland)."
+        elif command -v xclip &>/dev/null; then
+            echo "$PUB_CONTENT" | xclip -selection clipboard 2>/dev/null || true
+            info "✓ Public Key ($SSH_KEY) disalin ke Clipboard (X11)."
+        fi
+        echo ""
+        gum style --border rounded --padding "1 2" --border-foreground 82 \
+            "PUBLIC SSH KEY ($SSH_KEY):" \
+            "$PUB_CONTENT"
+    else
+        warn "Tidak ditemukan file public SSH key di ~/.ssh/"
+    fi
+}
 configure_git_identity() {
     info "Memeriksa konfigurasi Git..."
     if ! command -v git &>/dev/null; then
@@ -102,8 +141,14 @@ configure_ssh_key() {
     info "Buka https://github.com/settings/ssh/new untuk menempelkan SSH key di atas."
 }
 
-configure_git_identity
-configure_ssh_key
-
-echo ""
-success "Konfigurasi Git & SSH selesai."
+case "$ACTION" in
+    "⚡  Konfigurasi Identitas Git"*)
+        configure_git_identity
+        configure_ssh_key
+        echo ""
+        success "Konfigurasi Git & SSH selesai."
+        ;;
+    "📋  Tampilkan & Salin Public SSH Key"*)
+        show_existing_public_key
+        ;;
+esac

@@ -3,15 +3,21 @@ set -e
 
 source "$(dirname "$0")/env.sh"
 
-echo ""
+render_breadcrumb "Aplikasi Sistem Native (DNF / APT)"
+
 gum style \
     --foreground 33 --border-foreground 33 --border rounded \
     --align center --width 64 --padding "1 2" --bold \
     "NATIVE APPLICATION REPOSITORY" "Developer Tools, Antigravity, VSCode, Docker & Utilities"
 
-info "Pilih aplikasi sistem native (DNF / APT) yang ingin diinstall (Spasi untuk memilih, Enter untuk konfirmasi):"
+echo ""
+gum style --foreground 245 " [↑/↓] Navigasi • [Spasi] Pilih / Batal Centang • [Enter] Konfirmasi • [Esc] Kembali"
 
 CHOICES=$(gum choose --no-limit \
+    --cursor="❯ " \
+    --cursor.foreground="33" \
+    --selected.foreground="82" \
+    "⬅️   [Kembali ke Menu Utama]" \
     "Development Tools (gcc, make, git, curl, wget, cmake)" \
     "Google Antigravity CLI (agy)" \
     "Google Antigravity IDE (Desktop Application)" \
@@ -21,10 +27,10 @@ CHOICES=$(gum choose --no-limit \
     "BTop (Modern Resource Monitor)" \
     "BleachBit (System Cleaner)" \
     "EasyEffects & Plugins (Audio Enhancer / Equalizer)" \
-    "Flatseal (Flatpak Permissions Manager)")
+    "Flatseal (Flatpak Permissions Manager)" || true)
 
-if [ -z "$CHOICES" ]; then
-    info "Tidak ada aplikasi native yang dipilih."
+if [ -z "$CHOICES" ] || [[ "$CHOICES" == *"Kembali ke Menu Utama"* ]]; then
+    info "Kembali ke Menu Utama..."
     exit 0
 fi
 

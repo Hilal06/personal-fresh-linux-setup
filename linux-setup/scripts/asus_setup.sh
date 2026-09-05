@@ -10,13 +10,26 @@ set -e
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 source "$SCRIPT_DIR/env.sh"
 
-echo ""
+render_breadcrumb "ASUS ROG / TUF Gaming Utility"
+
 gum style \
     --foreground 196 --border-foreground 196 --border rounded \
     --align center --width 64 --padding "1 2" --bold \
     "ROG & TUF GAMING UTILITY" "ASUS Power, GPU MUX Switch & Battery Care"
 
-info "Memulai setup dan konfigurasi utilitas ASUS ROG / TUF..."
+echo ""
+ACTION=$(gum choose \
+    --cursor="❯ " \
+    --cursor.foreground="196" \
+    --header="Pilih tindakan utilitas ASUS ROG / TUF:" \
+    "⚡  Setup Lengkap (Install Driver, Background Services & Konfigurasi)" \
+    "⚙️   Hanya Buka Pengaturan (Battery Limit, Profil Daya, GPU Switcher)" \
+    "⬅️   [Kembali ke Menu Utama]" || true)
+
+if [ -z "$ACTION" ] || [[ "$ACTION" == *"Kembali ke Menu Utama"* ]]; then
+    info "Kembali ke Menu Utama..."
+    exit 0
+fi
 
 # 1. Deteksi Perangkat ASUS
 detect_asus_hardware() {
@@ -95,17 +108,22 @@ enable_asus_services() {
 
 # 4. Konfigurasi Interaktif Fitur ASUS
 configure_asus_settings() {
-    info "Pilih opsi konfigurasi ASUS yang ingin Anda atur (Spasi untuk memilih, Enter untuk konfirmasi):"
+    echo ""
+    gum style --foreground 245 " [↑/↓] Navigasi • [Spasi] Pilih / Batal Centang • [Enter] Konfirmasi • [Esc] Kembali"
 
     local CONFIG_CHOICES
     CONFIG_CHOICES=$(gum choose --no-limit \
+        --cursor="❯ " \
+        --cursor.foreground="196" \
+        --selected.foreground="82" \
+        "⬅️   [Kembali]" \
         "Set Batas Pengisian Baterai (Battery Health / Care Limit)" \
         "Set Default Power Profile (Quiet / Balanced / Performance)" \
         "Set Graphics / GPU Mode Switcher (supergfxctl)" \
-        "Set Kecerahan Keyboard Backlight")
+        "Set Kecerahan Keyboard Backlight" || true)
 
-    if [ -z "$CONFIG_CHOICES" ]; then
-        info "Tidak ada konfigurasi yang dipilih."
+    if [ -z "$CONFIG_CHOICES" ] || [[ "$CONFIG_CHOICES" == *"Kembali"* ]]; then
+        info "Kembali..."
         return 0
     fi
 
@@ -121,7 +139,19 @@ configure_asus_settings() {
                 info "Batas pengisian baterai saat ini: $CURRENT_LIMIT"
 
                 local TARGET_LIMIT
-                TARGET_LIMIT=$(gum choose "80 (Direkomendasikan untuk baterai awet)" "60 (Maksimal masa pakai saat dicolok terus)" "100 (Kapasitas penuh 100%)")
+                TARGET_LIMIT=$(gum choose \
+                    --cursor="❯ " \
+                    --cursor.foreground="196" \
+                    "80 (Direkomendasikan untuk baterai awet)" \
+                    "60 (Maksimal masa pakai saat dicolok terus)" \
+                    "100 (Kapasitas penuh 100%)" \
+                    "⬅️   [Kembali]" || true)
+
+                if [ -z "$TARGET_LIMIT" ] || [[ "$TARGET_LIMIT" == *"Kembali"* ]]; then
+                    info "Batal mengatur batas pengisian baterai."
+                    continue
+                fi
+
                 local NUM_LIMIT
                 NUM_LIMIT=$(echo "$TARGET_LIMIT" | awk '{print $1}')
 
@@ -129,7 +159,9 @@ configure_asus_settings() {
                     info "Menerapkan batas baterai ke $NUM_LIMIT%..."
                     asusctl battery limit "$NUM_LIMIT" 2>/dev/null || {
                         for b in /sys/class/power_supply/BAT*/charge_control_end_threshold; do
-                            [ -f "$b" ] && echo "$NUM_LIMIT" | sudo tee "$b" >/dev/null || true
+                            if [ -f "$b" ]; then
+                                echo "$NUM_LIMIT" | sudo tee "$b" >/dev/null || true
+                            fi
                         done
                     }
                     success "Batas pengisian baterai berhasil diatur ke $NUM_LIMIT%."
@@ -143,12 +175,20 @@ configure_asus_settings() {
                 info "Profil daya saat ini: $CURRENT_PROFILE"
 
                 local TARGET_PROFILE
-                TARGET_PROFILE=$(gum choose "Balanced" "Quiet" "Performance")
-                if [ -n "$TARGET_PROFILE" ]; then
-                    info "Mengubah profil daya ke $TARGET_PROFILE..."
-                    asusctl profile set "$TARGET_PROFILE" || warn "Gagal mengatur profil daya."
-                    success "Profil daya aktif diatur ke $TARGET_PROFILE."
+                TARGET_PROFILE=$(gum choose \
+                    --cursor="❯ " \
+                    --cursor.foreground="196" \
+                    "Balanced" "Quiet" "Performance" \
+                    "⬅️   [Kembali]" || true)
+
+                if [ -z "$TARGET_PROFILE" ] || [[ "$TARGET_PROFILE" == *"Kembali"* ]]; then
+                    info "Batal mengatur profil daya."
+                    continue
                 fi
+
+                info "Mengubah profil daya ke $TARGET_PROFILE..."
+                asusctl profile set "$TARGET_PROFILE" || warn "Gagal mengatur profil daya."
+                success "Profil daya aktif diatur ke $TARGET_PROFILE."
                 ;;
 
             "Set Graphics / GPU Mode Switcher"*)
@@ -162,7 +202,18 @@ configure_asus_settings() {
                     info "Mode GPU yang didukung sistem: $SUPPORTED_GPUS"
 
                     local TARGET_GPU
-                    TARGET_GPU=$(gum choose "Hybrid (Otomatis: iGPU untuk hemat daya + dGPU saat dibutuhkan)" "Integrated (Hanya iGPU - matikan dGPU untuk baterai awet)" "AsusMuxDgpu (Direct Dedicated GPU / MUX Switch)")
+                    TARGET_GPU=$(gum choose \
+                        --cursor="❯ " \
+                        --cursor.foreground="196" \
+                        "Hybrid (Otomatis: iGPU untuk hemat daya + dGPU saat dibutuhkan)" \
+                        "Integrated (Hanya iGPU - matikan dGPU untuk baterai awet)" \
+                        "AsusMuxDgpu (Direct Dedicated GPU / MUX Switch)" \
+                        "⬅️   [Kembali]" || true)
+
+                    if [ -z "$TARGET_GPU" ] || [[ "$TARGET_GPU" == *"Kembali"* ]]; then
+                        info "Batal mengatur mode GPU."
+                        continue
+                    fi
 
                     local GPU_MODE
                     case "$TARGET_GPU" in
@@ -185,27 +236,39 @@ configure_asus_settings() {
             "Set Kecerahan Keyboard Backlight"*)
                 echo ""
                 local TARGET_BRIGHTNESS
-                TARGET_BRIGHTNESS=$(gum choose "med" "high" "low" "off")
-                if [ -n "$TARGET_BRIGHTNESS" ]; then
-                    info "Mengatur kecerahan backlight keyboard ke '$TARGET_BRIGHTNESS'..."
-                    asusctl leds set "$TARGET_BRIGHTNESS" || warn "Gagal mengatur backlight keyboard."
-                    success "Backlight keyboard diatur ke $TARGET_BRIGHTNESS."
+                TARGET_BRIGHTNESS=$(gum choose \
+                    --cursor="❯ " \
+                    --cursor.foreground="196" \
+                    "med" "high" "low" "off" \
+                    "⬅️   [Kembali]" || true)
+
+                if [ -z "$TARGET_BRIGHTNESS" ] || [[ "$TARGET_BRIGHTNESS" == *"Kembali"* ]]; then
+                    info "Batal mengatur backlight keyboard."
+                    continue
                 fi
+
+                info "Mengatur kecerahan backlight keyboard ke '$TARGET_BRIGHTNESS'..."
+                asusctl leds set "$TARGET_BRIGHTNESS" || warn "Gagal mengatur backlight keyboard."
+                success "Backlight keyboard diatur ke $TARGET_BRIGHTNESS."
                 ;;
         esac
     done
 }
 
-# Eksekusi
-detect_asus_hardware
-install_asus_packages
-enable_asus_services
-
-if gum confirm "Apakah Anda ingin mengatur konfigurasi profil & baterai ASUS sekarang?"; then
-    configure_asus_settings
-else
-    info "Melewati konfigurasi interaktif ASUS."
-fi
+# Eksekusi Berdasarkan Pilihan
+case "$ACTION" in
+    "⚡  Setup Lengkap"*)
+        detect_asus_hardware
+        install_asus_packages
+        enable_asus_services
+        if gum confirm "Apakah Anda ingin mengatur konfigurasi profil & baterai ASUS sekarang?"; then
+            configure_asus_settings
+        fi
+        ;;
+    "⚙️   Hanya Buka Pengaturan"*)
+        configure_asus_settings
+        ;;
+esac
 
 echo ""
 success "============================================================"

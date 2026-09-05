@@ -195,14 +195,12 @@ personal-fresh-linux-setup/
 
 Berikut adalah rangkuman pembaruan versi terbaru. Untuk riwayat selengkapnya, silakan baca berkas [CHANGELOG.md](CHANGELOG.md).
 
-> ### 🚀 `v2026.09.05` - Multi-Distro Support & Interactive Dotfiles Rollback
-> - **Dukungan Ubuntu Penuh**: Kompatibilitas untuk Ubuntu Desktop (GNOME) & Kubuntu (KDE Plasma) menggunakan package manager `apt`, termasuk setup repositori universe/multiverse dan instalasi eza.
-> - **Eksklusi Arch Linux**: Menghapus seluruh dependensi `pacman` dan menambahkan rejection guard yang menolak eksekusi pada Arch Linux demi menjaga integritas sistem.
-> - **Rollback Dotfiles Interaktif**: Utilitas pemulihan di `maintenance.sh` kini mendukung pemilihan snapshot waktu backup spesifik (`~/.dotfiles_backup/`) dengan pre-restore safety snapshot.
-> - **Modul Mandiri Git & SSH Key**: Menambahkan `git_ssh_setup.sh` dengan integrasi clipboard otomatis Wayland (`wl-copy`) & X11 (`xclip`).
-> - **Auto-Set Font GNOME & Konsole**: Mendukung konfigurasi font terminal otomatis untuk profil GNOME Terminal dan KDE Konsole.
-> - **CI/CD GitHub Actions Baru**: Pengujian otomatis terintegrasi menggunakan ShellCheck, `bash -n`, Docker container matrix (`fedora:latest` & `ubuntu:24.04`), dan Arch rejection assertion.
-> - **Perbaikan Tipografi**: Mengoreksi typo penulisan "Utillity" menjadi "Utility" di seluruh banner dan berkas proyek.
+> ### 🚀 `v2026.09.05` - Modern Interactive CLI Navigation & Sub-Menu Back Flow
+> - **Interactive Dashboard Loop**: `setup.sh` kini beroperasi dalam loop menu dinamis tanpa langsung keluar, dilengkapi badge status sistem dinamis (OS, Desktop Environment, Kernel, Host & User).
+> - **Tombol [Kembali ke Menu Utama]**: Menambahkan opsi kembali eksplisit di baris pertama seluruh modul sub-menu (`system_essentials.sh`, `rpm_apps.sh`, `flatpak_apps.sh`, `setup_terminal.sh`, `asus_setup.sh`, `git_ssh_setup.sh`, `maintenance.sh`).
+> - **Safe Esc & Cancel Handling**: Proteksi graceful cancel (`|| true`) di semua dialog `gum choose` sehingga penekanan tombol `Esc` tidak lagi mentrigger abort shell `set -e`.
+> - **Breadcrumb Navigasi & Modern Pointer**: Indikator lokasi menu hierarkis (`🧭 Menu Utama > Modul`), cursor modern `❯ `, serta bar panduan keybinding interaktif.
+> - **Linting ShellCheck 100% Clean**: Seluruh skrip shell lolos static analysis ShellCheck tanpa error maupun warning.
 
 ---
 

@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# ==============================================================================
+# Fresh Linux Setup Suite - Main Interactive CLI Dashboard
+# ==============================================================================
+
 set -e
 
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
@@ -12,86 +16,96 @@ source "$SCRIPT_DIR/scripts/env.sh"
 # Minta kredensial sudo di awal secara interaktif agar tidak membekukan gum spin di latar belakang
 sudo -v
 
-# 2. Bersihkan terminal dan tampilkan Header TUI langsung di awal
+# 2. Bersihkan terminal dan inisialisasi repositori awal
 clear
 echo ""
-
-gum style \
-	--foreground 212 --border-foreground 212 --border rounded \
-	--align center --width 64 --margin "0 2 1 2" --padding "1 2" --bold \
-	"$(gum style --foreground 39 --bold '█░█ █ █░░ ▄▀█ █░░ █▀█ █▄▄')" \
-	"$(gum style --foreground 39 --bold '█▀█ █ █▄▄ █▀█ █▄▄ █▄█ █▄█')" \
-	"" \
-	"Fresh Linux Setup Utility" \
-	"Personal System Setup & Automation Suite"
-
-# 3. Setup repository environment menggunakan spinner TUI (cepat & non-blocking)
 gum spin --spinner dot --title "Menyiapkan repositori & environment sistem..." -- bash -c "source '$SCRIPT_DIR/scripts/env.sh' && setup_environment_repos"
 
-echo ""
-info "Pilih tugas yang ingin Anda jalankan (Gunakan [Spasi] untuk memilih, [Enter] untuk konfirmasi):"
-
-# 4. Top-Level Menu Interaktif TUI
-CHOICES=$(gum choose --no-limit \
-    "Setup Shell & Terminal (Zsh, Starship, Dotfiles)" \
-    "Install System Essentials & Media Codecs" \
-    "Install Aplikasi Sistem / Native (DNF / APT)" \
-    "Install Aplikasi Flatpak (Flathub)" \
-    "Setup & Konfigurasi ASUS ROG / TUF Utilities" \
-    "Setup Identitas Git & SSH Key Developer (GitHub)" \
-    "System Maintenance & Health Check (Rollback Dotfiles)")
-
-if [ -z "$CHOICES" ]; then
-    warn "Tidak ada tugas yang dipilih. Keluar..."
-    exit 0
+# 3. Deteksi Informasi Sistem untuk Dashboard Header
+DISTRO_NAME="Linux"
+if [ -f /etc/os-release ]; then
+    DISTRO_NAME="$(. /etc/os-release && echo "${PRETTY_NAME:-$NAME}")"
 fi
+CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:-${DESKTOP_SESSION:-Terminal}}"
+KERNEL_VER="$(uname -r)"
+HOST_NAME="$(hostname 2>/dev/null || uname -n)"
+SYS_USER="${USER:-$(whoami)}"
 
-# 5. Konversi pilihan ke array agar stdin (TTY) tidak terdistorsi untuk sub-menu interaktif
-mapfile -t SELECTED_TASKS <<< "$CHOICES"
+# 4. Main Interactive Navigation Loop
+while true; do
+    clear
+    echo ""
 
-for task in "${SELECTED_TASKS[@]}"; do
-    [ -z "$task" ] && continue
-    case "$task" in
-        "Setup Shell & Terminal (Zsh, Starship, Dotfiles)")
-            echo ""
-            gum style --foreground 99 --bold ">>> Menjalankan Setup Shell & Terminal..."
-            "$SCRIPT_DIR/scripts/setup_terminal.sh"
+    # Banner Header Modern TUI
+    gum style \
+        --foreground 212 --border-foreground 212 --border rounded \
+        --align center --width 68 --margin "0 1 1 1" --padding "1 2" --bold \
+        "$(gum style --foreground 39 --bold '█░█ █ █░░ ▄▀█ █░░ █▀█ █▄▄')" \
+        "$(gum style --foreground 39 --bold '█▀█ █ █▄▄ █▀█ █▄▄ █▄█ █▄█')" \
+        "" \
+        "Fresh Linux Setup Suite" \
+        "Personal System Setup & Automation Dashboard" \
+        "" \
+        "$(gum style --foreground 245 --faint "OS: $DISTRO_NAME ($CURRENT_DESKTOP) • Kernel: $KERNEL_VER")" \
+        "$(gum style --foreground 245 --faint "User: $SYS_USER@$HOST_NAME • Distro Target: ${DISTRO_TYPE^^}")"
+
+    echo ""
+    gum style --foreground 245 " [↑/↓] Navigasi Pilihan • [Enter] Buka Modul • [Esc] Keluar"
+
+    CHOICE=$(gum choose \
+        --cursor="❯ " \
+        --cursor.foreground="212" \
+        --header="Pilih modul yang ingin Anda konfigurasi:" \
+        "💻  Setup Shell & Terminal (Zsh, Starship, Dotfiles)" \
+        "⚡  Install System Essentials & Media Codecs" \
+        "📦  Install Aplikasi Sistem Native (DNF / APT)" \
+        "🚀  Install Aplikasi Flatpak (Flathub)" \
+        "🎮  Setup & Konfigurasi ASUS ROG / TUF Utilities" \
+        "🔑  Setup Identitas Git & SSH Key Developer" \
+        "🩺  System Maintenance & Health Check (Rollback Dotfiles)" \
+        "────────────────────────────────────────────────────────────" \
+        "🚪  Keluar / Selesai" || true)
+
+    # Tangani pembatalan, Esc, atau pemilihan Keluar
+    if [ -z "$CHOICE" ] || [[ "$CHOICE" == *"Keluar / Selesai"* ]] || [[ "$CHOICE" == *"────"* ]]; then
+        clear
+        echo ""
+        gum style \
+            --foreground 82 --border-foreground 82 --border rounded \
+            --align center --width 64 --padding "1 2" --bold \
+            "🎉 TERIMA KASIH TELAH MENGGUNAKAN FRESH LINUX SETUP!" \
+            "Semua perubahan tersimpan aman. Selamat berkarya!"
+        echo ""
+        exit 0
+    fi
+
+    # Eksekusi modul yang dipilih
+    case "$CHOICE" in
+        "💻  Setup Shell & Terminal"*)
+            "$SCRIPT_DIR/scripts/setup_terminal.sh" || true
             ;;
-        "Install System Essentials & Media Codecs")
-            echo ""
-            gum style --foreground 99 --bold ">>> Menjalankan Instalasi System Essentials & Media Codecs..."
-            "$SCRIPT_DIR/scripts/system_essentials.sh"
+        "⚡  Install System Essentials"*)
+            "$SCRIPT_DIR/scripts/system_essentials.sh" || true
             ;;
-        "Install Aplikasi Sistem / Native (DNF / APT)")
-            echo ""
-            gum style --foreground 99 --bold ">>> Menjalankan Instalasi Aplikasi Sistem Native..."
-            "$SCRIPT_DIR/scripts/rpm_apps.sh"
+        "📦  Install Aplikasi Sistem Native"*)
+            "$SCRIPT_DIR/scripts/rpm_apps.sh" || true
             ;;
-        "Install Aplikasi Flatpak (Flathub)")
-            echo ""
-            gum style --foreground 99 --bold ">>> Menjalankan Instalasi Aplikasi Flatpak..."
-            "$SCRIPT_DIR/scripts/flatpak_apps.sh"
+        "🚀  Install Aplikasi Flatpak"*)
+            "$SCRIPT_DIR/scripts/flatpak_apps.sh" || true
             ;;
-        "Setup & Konfigurasi ASUS ROG / TUF Utilities")
-            echo ""
-            gum style --foreground 99 --bold ">>> Menjalankan Setup & Konfigurasi ASUS ROG / TUF Utilities..."
-            "$SCRIPT_DIR/scripts/asus_setup.sh"
+        "🎮  Setup & Konfigurasi ASUS ROG"*)
+            "$SCRIPT_DIR/scripts/asus_setup.sh" || true
             ;;
-        "Setup Identitas Git & SSH Key Developer (GitHub)")
-            echo ""
-            gum style --foreground 99 --bold ">>> Menjalankan Setup Git & SSH Key..."
-            "$SCRIPT_DIR/scripts/git_ssh_setup.sh"
+        "🔑  Setup Identitas Git & SSH Key"*)
+            "$SCRIPT_DIR/scripts/git_ssh_setup.sh" || true
             ;;
-        "System Maintenance & Health Check (Rollback Dotfiles)")
-            echo ""
-            gum style --foreground 99 --bold ">>> Menjalankan System Maintenance & Health Check..."
-            "$SCRIPT_DIR/scripts/maintenance.sh"
+        "🩺  System Maintenance & Health Check"*)
+            "$SCRIPT_DIR/scripts/maintenance.sh" || true
             ;;
     esac
-done
 
-echo ""
-gum style \
-	--foreground 82 --border-foreground 82 --border rounded \
-	--align center --width 64 --padding "1 2" --bold \
-	"🎉 SETUP SELESAI!" "Semua konfigurasi Fresh Linux Setup Utility berhasil diterapkan."
+    # Prompt kembali ke menu utama
+    echo ""
+    gum style --foreground 245 " Tekan [Enter] untuk kembali ke Menu Utama..."
+    read -r -s -d $'\n' < /dev/tty 2>/dev/null || read -r -s -n 1 2>/dev/null || true
+done

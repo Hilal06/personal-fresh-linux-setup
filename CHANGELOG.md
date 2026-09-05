@@ -4,6 +4,22 @@ Dokumentasi riwayat pembaruan dan otomasi commit proyek `personal-fresh-linux-se
 
 ---
 
+### 🚀 [2026-09-05 14:44:51] - feat(tui): upgrade interactive navigation loop, sub-menu back flow and modern CLI styling
+
+- **Author**: Rifaul <rifaulhilal06@gmail.com>
+- **Branch**: main
+- **Files Changed**:
+  -  M README.md
+  -  M linux-setup/scripts/asus_setup.sh
+  -  M linux-setup/scripts/env.sh
+  -  M linux-setup/scripts/flatpak_apps.sh
+  -  M linux-setup/scripts/git_ssh_setup.sh
+  -  M linux-setup/scripts/maintenance.sh
+  -  M linux-setup/scripts/rpm_apps.sh
+  -  M linux-setup/scripts/setup_terminal.sh
+  -  M linux-setup/scripts/system_essentials.sh
+  -  M linux-setup/setup.sh
+
 ### 🚀 [2026-09-05 14:10:00] - fix(ci): specify bash shell and use standard dot sourcing in container tests
 
 - **Author**: Rifaul <rifaulhilal06@gmail.com>

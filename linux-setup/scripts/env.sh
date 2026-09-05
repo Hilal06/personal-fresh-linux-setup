@@ -17,6 +17,13 @@ success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 error() { echo -e "${RED}[ERROR]${NC} $1"; exit 1; }
 
+# Helper untuk merender breadcrumbs navigasi modern TUI
+render_breadcrumb() {
+    local PATH_STR="$1"
+    echo ""
+    gum style --foreground 240 "🧭 $PATH_STR"
+}
+
 # Fallback untuk environment root / container minimal tanpa command sudo
 if ! command -v sudo &>/dev/null && [ "${EUID:-$(id -u)}" -eq 0 ]; then
     sudo() { "$@"; }

@@ -9,22 +9,28 @@ set -e
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 source "$SCRIPT_DIR/env.sh"
 
-echo ""
+render_breadcrumb "System Health & Maintenance"
+
 gum style \
     --foreground 39 --border-foreground 39 --border double \
     --align center --width 60 --padding "1 2" \
     "SYSTEM HEALTH & MAINTENANCE" "Post-Setup Diagnostic & Cleanup Utility"
 
-info "Pilih tugas maintenance yang ingin dijalankan (Spasi untuk memilih, Enter untuk konfirmasi):"
+echo ""
+gum style --foreground 245 " [↑/↓] Navigasi • [Spasi] Pilih / Batal Centang • [Enter] Konfirmasi • [Esc] Kembali"
 
 CHOICES=$(gum choose --no-limit \
+    --cursor="❯ " \
+    --cursor.foreground="39" \
+    --selected.foreground="82" \
+    "⬅️   [Kembali ke Menu Utama]" \
     "System Health Check (Hardware, Services, GPU & Btrfs Status)" \
     "Clean Package Caches & Old Kernels (DNF / APT & Flatpak Clean)" \
     "Btrfs Scrub & Filesystem Health Check" \
-    "Rollback / Restore Dotfiles dari Backup (~/.dotfiles_backup)")
+    "Rollback / Restore Dotfiles dari Backup (~/.dotfiles_backup)" || true)
 
-if [ -z "$CHOICES" ]; then
-    info "Tidak ada tugas maintenance yang dipilih."
+if [ -z "$CHOICES" ] || [[ "$CHOICES" == *"Kembali ke Menu Utama"* ]]; then
+    info "Kembali ke Menu Utama..."
     exit 0
 fi
 
@@ -134,10 +140,12 @@ for task in "${SELECTED_TASKS[@]}"; do
 
             info "Pilih opsi pemulihan dotfiles:"
             RESTORE_ACTION=$(gum choose \
+                --cursor="❯ " \
+                --cursor.foreground="39" \
                 "Rollback ~/.zshrc dari Riwayat Backup (Timestamp)" \
                 "Rollback ~/.config/starship.toml dari Riwayat Backup (Timestamp)" \
                 "Restore Semua dari Backup Terakhir (.latest)" \
-                "Batal")
+                "⬅️   [Kembali]" || true)
 
             case "$RESTORE_ACTION" in
                 "Rollback ~/.zshrc"*)

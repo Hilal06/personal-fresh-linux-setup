@@ -12,13 +12,27 @@ CONFIGS_DIR="$SCRIPT_DIR/../configs"
 # Load environment & helper functions (info, success, warn, error, gum)
 source "$SCRIPT_DIR/env.sh"
 
-echo ""
+render_breadcrumb "Setup Shell & Terminal Workspace"
+
 gum style \
     --foreground 45 --border-foreground 45 --border rounded \
     --align center --width 64 --padding "1 2" --bold \
     "TERMINAL & SHELL WORKSPACE" "Zsh, Starship, FiraCode Nerd Font & Dotfiles"
 
-info "Memulai setup dan konfigurasi terminal modern..."
+echo ""
+ACTION=$(gum choose \
+    --cursor="❯ " \
+    --cursor.foreground="45" \
+    --header="Pilih mode setup terminal:" \
+    "🚀  Jalankan Setup Lengkap (CLI Tools, Font, Plugins, Dotfiles)" \
+    "🎨  Hanya Terapkan Dotfiles (~/.zshrc & starship.toml)" \
+    "🔤  Hanya Install FiraCode Nerd Font & Konfigurasi Profil Terminal" \
+    "⬅️   [Kembali ke Menu Utama]" || true)
+
+if [ -z "$ACTION" ] || [[ "$ACTION" == *"Kembali ke Menu Utama"* ]]; then
+    info "Kembali ke Menu Utama..."
+    exit 0
+fi
 
 # 1. Install CLI Tools & Starship
 install_cli_tools() {
@@ -264,20 +278,33 @@ configure_git_and_ssh() {
     fi
 }
 
-# Eksekusi
-install_cli_tools
-install_firacode_nerd_font
-setup_plugins
+# Eksekusi Berdasarkan Pilihan
+case "$ACTION" in
+    "🚀  Jalankan Setup Lengkap"*)
+        install_cli_tools
+        install_firacode_nerd_font
+        setup_plugins
 
-if gum confirm "Terapkan file konfigurasi dotfiles (starship.toml & .zshrc)?"; then
-    deploy_starship_config
-    deploy_zshrc_config
-else
-    info "Melewati penyalinan dotfiles terminal."
-fi
+        if gum confirm "Terapkan file konfigurasi dotfiles (starship.toml & .zshrc)?"; then
+            deploy_starship_config
+            deploy_zshrc_config
+        else
+            info "Melewati penyalinan dotfiles terminal."
+        fi
 
-configure_git_and_ssh
-set_default_shell
+        configure_git_and_ssh
+        set_default_shell
+        ;;
+
+    "🎨  Hanya Terapkan Dotfiles"*)
+        deploy_starship_config
+        deploy_zshrc_config
+        ;;
+
+    "🔤  Hanya Install FiraCode"*)
+        install_firacode_nerd_font
+        ;;
+esac
 
 echo ""
 success "============================================================"

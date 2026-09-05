@@ -3,15 +3,21 @@ set -e
 
 source "$(dirname "$0")/env.sh"
 
-echo ""
+render_breadcrumb "Aplikasi Flatpak (Flathub)"
+
 gum style \
     --foreground 69 --border-foreground 69 --border rounded \
     --align center --width 64 --padding "1 2" --bold \
     "FLATHUB APPLICATION STORE" "Sandboxed Desktop Applications & Productivity"
 
-info "Pilih aplikasi berbasis Flatpak (Flathub) yang ingin diinstall (Spasi untuk memilih, Enter untuk konfirmasi):"
+echo ""
+gum style --foreground 245 " [↑/↓] Navigasi • [Spasi] Pilih / Batal Centang • [Enter] Konfirmasi • [Esc] Kembali"
 
 CHOICES=$(gum choose --no-limit \
+    --cursor="❯ " \
+    --cursor.foreground="69" \
+    --selected.foreground="82" \
+    "⬅️   [Kembali ke Menu Utama]" \
     "Google Chrome" \
     "ONLYOFFICE Desktop Editors" \
     "Thunderbird Mail ESR" \
@@ -24,10 +30,10 @@ CHOICES=$(gum choose --no-limit \
     "Logseq" \
     "LocalSend" \
     "Podman Desktop" \
-    "Arduino IDE")
+    "Arduino IDE" || true)
 
-if [ -z "$CHOICES" ]; then
-    info "Tidak ada aplikasi Flatpak yang dipilih."
+if [ -z "$CHOICES" ] || [[ "$CHOICES" == *"Kembali ke Menu Utama"* ]]; then
+    info "Kembali ke Menu Utama..."
     exit 0
 fi
 

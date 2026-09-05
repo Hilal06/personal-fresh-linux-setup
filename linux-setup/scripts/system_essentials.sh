@@ -3,25 +3,31 @@ set -e
 
 source "$(dirname "$0")/env.sh"
 
-echo ""
+render_breadcrumb "System Essentials & Media Codecs"
+
 gum style \
     --foreground 141 --border-foreground 141 --border rounded \
     --align center --width 64 --padding "1 2" --bold \
     "SYSTEM ESSENTIALS & CODECS" "Multimedia, Btrfs Snapshots & Desktop Optimization"
 
-info "Pilih modul System Essentials & Media Codecs yang ingin diinstall (Spasi untuk memilih, Enter untuk konfirmasi):"
+echo ""
+gum style --foreground 245 " [↑/↓] Navigasi • [Spasi] Pilih / Batal Centang • [Enter] Konfirmasi • [Esc] Kembali"
 
 CHOICES=$(gum choose --no-limit \
+    --cursor="❯ " \
+    --cursor.foreground="141" \
+    --selected.foreground="82" \
+    "⬅️   [Kembali ke Menu Utama]" \
     "Multimedia Codecs Lengkap (FFmpeg, GStreamer, libdvdcss, Audio/Video Extras)" \
     "Hardware Video Acceleration / Drivers (VA-API, Mesa Freeworld, Intel/AMD)" \
     "System Utilities & Compression (p7zip, unrar, tar, rsync, lshw, pciutils)" \
     "KDE Plasma Enhancements (KDE Connect, Flatpak KCM integration)" \
     "Btrfs Assistant & Snapper (GUI Snapshot, Maintenance, Subvolume Management)" \
     "System Performance & Thermal Tuning (thermald, tuned, preload)" \
-    "Kernel & Sysctl Desktop Tuning (ZRAM Swappiness, File Watcher Handles)")
+    "Kernel & Sysctl Desktop Tuning (ZRAM Swappiness, File Watcher Handles)" || true)
 
-if [ -z "$CHOICES" ]; then
-    info "Tidak ada opsi System Essentials yang dipilih."
+if [ -z "$CHOICES" ] || [[ "$CHOICES" == *"Kembali ke Menu Utama"* ]]; then
+    info "Kembali ke Menu Utama..."
     exit 0
 fi
 
