@@ -4,6 +4,14 @@ Dokumentasi riwayat pembaruan dan otomasi commit proyek `personal-fresh-linux-se
 
 ---
 
+### 🚀 [2026-09-05 14:55:35] - docs: rework README and update changelog with interactive TUI dashboard & back flow
+
+- **Author**: Rifaul <rifaulhilal06@gmail.com>
+- **Branch**: main
+- **Files Changed**:
+  -  M README.md
+  -  M linux-setup/README.md
+
 ### 🚀 [2026-09-05 14:44:51] - feat(tui): upgrade interactive navigation loop, sub-menu back flow and modern CLI styling
 
 - **Author**: Rifaul <rifaulhilal06@gmail.com>

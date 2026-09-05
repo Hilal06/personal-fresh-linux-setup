@@ -22,22 +22,49 @@
 ## 🌌 Antarmuka Terminal & Menu Interaktif (TUI)
 
 ```text
+╭──────────────────────────────────────────────────────────────────╮
+│                   █░█ █ █░░ ▄▀█ █░░ █▀█ █▄▄                      │
+│                   █▀█ █ █▄▄ █▀█ █▄▄ █▄█ █▄█                      │
+│                                                                  │
+│                     Fresh Linux Setup Suite                      │
+│           Personal System Setup & Automation Dashboard           │
+│                                                                  │
+│       OS: Fedora Linux 44 (KDE Plasma) • Kernel: 6.13...         │
+│             User: faulfedora@asus • Distro Target: FEDORA        │
+╰──────────────────────────────────────────────────────────────────╯
+ [↑/↓] Navigasi Pilihan • [Enter] Buka Modul • [Esc] Keluar
+
+ ❯ 💻  Setup Shell & Terminal (Zsh, Starship, Dotfiles)
+   ⚡  Install System Essentials & Media Codecs
+   📦  Install Aplikasi Sistem Native (DNF / APT)
+   🚀  Install Aplikasi Flatpak (Flathub)
+   🎮  Setup & Konfigurasi ASUS ROG / TUF Utilities
+   🔑  Setup Identitas Git & SSH Key Developer
+   🩺  System Maintenance & Health Check (Rollback Dotfiles)
+   ────────────────────────────────────────────────────────────
+   🚪  Keluar / Selesai
+```
+
+### 🧭 Alur Sub-Menu & Tombol Kembali (Breadcrumb Navigation)
+
+Setiap sub-menu dilengkapi breadcrumb pelacak hierarki dan opsi eksplisit `[⬅️ Kembali ke Menu Utama]` di baris teratas:
+
+```text
+🧭 Menu Utama > System Essentials & Media Codecs
 ╭────────────────────────────────────────────────────────────────╮
-│                                                                │
-│                   █░█ █ █░░ ▄▀█ █░░ █▀█ █▄▄                    │
-│                   █▀█ █ █▄▄ █▀█ █▄▄ █▄█ █▄█                    │
-│                                                                │
-│                   Fresh Linux Setup Utility                    │
-│            Personal System Setup & Automation Suite            │
-│                                                                │
+│                  SYSTEM ESSENTIALS & CODECS                    │
+│       Multimedia, Btrfs Snapshots & Desktop Optimization       │
 ╰────────────────────────────────────────────────────────────────╯
-  [x] Setup Shell & Terminal (Zsh, Starship, FiraCode, Konsole & GNOME Font)
-  [x] Install System Essentials & Media Codecs (FFmpeg, VA-API, Btrfs & Sysctl)
-  [x] Install Native Apps (VSCode, Docker Engine, Antigravity CLI/IDE, Neovim)
-  [x] Install Sandboxed Apps (ONLYOFFICE, Spotube, Discord, Pika Backup)
-  [x] Setup & Konfigurasi ASUS ROG / TUF Utilities (Battery 80%, GPU Switch)
-  [x] Setup Identitas Git & SSH Key Developer (ed25519 & Clipboard Integration)
-  [x] System Maintenance & Health Check (Timestamped Dotfiles Rollback & Cache Clean)
+ [↑/↓] Navigasi • [Spasi] Pilih / Batal Centang • [Enter] Konfirmasi • [Esc] Kembali
+
+ ❯ • ⬅️   [Kembali ke Menu Utama]
+   • Multimedia Codecs Lengkap (FFmpeg, GStreamer, libdvdcss, Audio/Video Extras)
+   • Hardware Video Acceleration / Drivers (VA-API, Mesa Freeworld, Intel/AMD)
+   • System Utilities & Compression (p7zip, unrar, tar, rsync, lshw, pciutils)
+   • KDE Plasma Enhancements (KDE Connect, Flatpak KCM integration)
+   • Btrfs Assistant & Snapper (GUI Snapshot, Maintenance, Subvolume Management)
+   • System Performance & Thermal Tuning (thermald, tuned, preload)
+   • Kernel & Sysctl Desktop Tuning (ZRAM Swappiness, File Watcher Handles)
 ```
 
 ---
@@ -107,7 +134,15 @@ cd personal-fresh-linux-setup
 - **Instalasi FiraCode Nerd Font Otomatis**: Deteksi font sistem dan unduhan langsung versi rilis resmi GitHub.
 - **Auto-Config Font Terminal**: Otomatis menyetel font profil **KDE Konsole** (`kwriteconfig6/5`) dan **GNOME Terminal** (`gsettings`) ke `FiraCode Nerd Font 11` tanpa perlu klik manual.
 
-### 🛠️ 2. Otomasi Identitas Git & SSH Key Developer
+### 🧭 2. Dashboard Loop & Navigasi Interaktif Modern
+- **Persistent Navigation Loop**: `setup.sh` beroperasi dalam loop menu dinamis (`while true`) sehingga Anda bebas menjelajahi berbagai modul tanpa perlu memanggil ulang script dari awal.
+- **Dynamic System Status Badge**: Menampilkan ringkasan sistem real-time (Distro, Desktop Environment KDE/GNOME, Kernel, User, dan Hostname).
+- **Tombol Eksplisit `[⬅️ Kembali ke Menu Utama]`**: Diletakkan di baris pertama seluruh sub-menu agar pembatalan atau navigasi balik terasa intuitif.
+- **Safe Esc & Cancel Handling**: Proteksi error handling (`|| true`) di seluruh antarmuka Gum, memastikan penekanan tombol `Esc` atau `Enter` kosong kembali ke menu utama dengan aman tanpa memicu crash `set -e` (exit code 130).
+- **Breadcrumb Navigation Indicator**: Menampilkan jejak posisi menu aktif (misal: `🧭 Menu Utama > Aplikasi Flatpak (Flathub)`).
+- **Modern Pointer & Styling**: Menggunakan cursor modern `❯ ` dengan pewarnaan modular untuk meningkatkan estetika visual.
+
+### 🛠️ 3. Otomasi Identitas Git & SSH Key Developer
 - **Git Identity Wizard**: Konfigurasi global nama (`user.name`), email (`user.email`), dan inisialisasi default branch `main`.
 - **Generator Kunci SSH `ed25519`**: Membuat private & public key dengan enkripsi modern dan hak akses aman (`chmod 700` & `chmod 600`).
 - **Integrasi Clipboard Otomatis**: Mendeteksi display server aktif dan langsung menyalin Public SSH Key ke clipboard:
@@ -115,12 +150,12 @@ cd personal-fresh-linux-setup
   - X11: via `xclip`
 - Tampilan Public Key berbingkai rapi dengan tautan langsung ke halaman pengaturan GitHub SSH Keys.
 
-### 🔄 3. Safe Dotfiles Backup & Timestamped Rollback
+### 🔄 4. Safe Dotfiles Backup & Timestamped Rollback
 - **Pencadangan Otomatis**: Setiap kali dotfiles (`~/.zshrc` dan `~/.config/starship.toml`) diperbarui, versi sebelumnya dicadangkan ke `~/.dotfiles_backup/` dengan format timestamp (`.backup.YYYYMMDDHHMMSS`).
 - **Rollback Interaktif**: Menu pemulihan pada `maintenance.sh` memindai seluruh snapshot backup yang tersedia dan memungkinkan Anda memilih versi spesifik untuk di-restore via Charm Gum.
 - **Safety Pre-Restore Snapshot**: Sebelum menimpa berkas konfigurasi aktif saat proses rollback, sistem membuat safety snapshot cadangan (`.pre_restore.YYYYMMDDHHMMSS`).
 
-### 💻 4. Integrasi Hardware Laptop ASUS ROG / TUF Gaming
+### 💻 5. Integrasi Hardware Laptop ASUS ROG / TUF Gaming
 - Otomatis memasang `asusctl`, `rog-control-center`, dan `supergfxctl` (pada Fedora) atau memberikan panduan PPA komunitas resmi (pada Ubuntu).
 - **80% Battery Care**: Mengaktifkan batas pengisian daya untuk memperpanjang usia baterai lithium-ion.
 - **GPU Switching & Fan Profiles**: Menambahkan alias terminal praktis:
@@ -128,14 +163,14 @@ cd personal-fresh-linux-setup
   - `asus-quiet`, `asus-bal`, `asus-perf`: Ganti profil kipas dan daya
   - `gpu-hybrid`, `gpu-igpu`, `gpu-dgpu`: Ganti mode grafis laptop
 
-### 🎛️ 5. Optimasi Sistem & Desktop Tuning
+### 🎛️ 6. Optimasi Sistem & Desktop Tuning
 - **Optimasi Kecepatan DNF**: Otomatis menyuntikkan `max_parallel_downloads=10`, `fastestmirror=True`, dan `defaultyes=True` pada `/etc/dnf/dnf.conf`.
 - **Tuning Kernel Sysctl**:
   - `vm.swappiness = 180` & `vm.vfs_cache_pressure = 50`: Memaksimalkan efisiensi kompresi memori ZRAM.
   - `fs.inotify.max_user_watches = 524288`: Mencegah crash file watcher pada Node.js, VSCode, Docker, dan Android Studio.
 - **Btrfs Assistant & Snapper**: Konfigurasi otomatis snapshot sistem root (`/`) dengan timer pembersihan berkala.
 
-### 📦 6. Ekosistem Aplikasi Native & Sandboxed
+### 📦 7. Ekosistem Aplikasi Native & Sandboxed
 - **Aplikasi Native (DNF / APT)**:
   - Google Antigravity (CLI `agy` & IDE Desktop)
   - Visual Studio Code (Microsoft Official Repositories)
@@ -144,10 +179,10 @@ cd personal-fresh-linux-setup
 - **Aplikasi Sandboxed (Flathub / Flatpak)**:
   - ONLYOFFICE Desktop Editors, Spotube (Spotify Client), Discord, Thunderbird Mail, VLC, Pika Backup, DBeaver, Bruno API Client, Logseq, LocalSend, Podman Desktop, Arduino IDE.
 
-### 🧪 7. Otomasi Pengujian & CI/CD Pipeline
+### 🧪 8. Otomasi Pengujian, ShellCheck & CI/CD Pipeline
 - Pipeline GitHub Actions bertenaga container [`.github/workflows/ci.yml`](.github/workflows/ci.yml) yang berjalan pada setiap push & pull request:
-  - **Static Analysis**: ShellCheck memeriksa kepatuhan standar POSIX/Bash.
-  - **Syntax Verification**: Pengujian `bash -n` pada semua berkas skrip.
+  - **Static Analysis**: ShellCheck memeriksa kepatuhan standar POSIX/Bash (100% lolos tanpa peringatan).
+  - **Syntax Verification**: Pengujian `bash -n` pada semua berkas skrip shell.
   - **Multi-Distro Matrix**: Pengujian nyata di dalam container `fedora:latest` dan `ubuntu:24.04`.
   - **Arch Rejection Assertion**: Memastikan sistem Arch/pacman ditolak secara elegan tanpa merusak konfigurasi.
 
