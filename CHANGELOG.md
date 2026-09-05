@@ -4,6 +4,17 @@ Dokumentasi riwayat pembaruan dan otomasi commit proyek `personal-fresh-linux-se
 
 ---
 
+### 🚀 [2026-09-05 14:10:00] - fix(ci): specify bash shell and use standard dot sourcing in container tests
+
+- **Author**: Rifaul <rifaulhilal06@gmail.com>
+- **Branch**: main
+- **Highlights**:
+  - Fixed GitHub Actions runner in Ubuntu container defaulting to `/bin/sh` (`dash`), which lacks the `source` built-in command.
+  - Configured `defaults: run: shell: bash` and `shell: bash` explicitly on container tests job.
+  - Replaced `source` with standard dot operator (`.`) for sourcing `env.sh`.
+- **Files Changed**:
+  - M .github/workflows/ci.yml
+
 ### 🚀 [2026-09-05 13:43:00] - refactor: rename directory fedora-setup to linux-setup and update all references
 
 - **Author**: Rifaul <rifaulhilal06@gmail.com>

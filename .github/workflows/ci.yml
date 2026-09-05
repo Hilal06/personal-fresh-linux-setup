@@ -56,11 +56,16 @@ jobs:
     container:
       image: ${{ matrix.distro.image }}
 
+    defaults:
+      run:
+        shell: bash
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Verify Distro Environment & Scripts
+        shell: bash
         run: |
           echo "=== Testing on ${{ matrix.distro.name }} (${{ matrix.distro.image }}) ==="
           
@@ -70,7 +75,7 @@ jobs:
           done
 
           # 2. Package manager and Gum check in env.sh
-          source linux-setup/scripts/env.sh
+          . linux-setup/scripts/env.sh
           echo "Detected DISTRO_TYPE: $DISTRO_TYPE"
           if [ "$DISTRO_TYPE" != "${{ matrix.distro.expected_type }}" ]; then
             echo "Expected distro type '${{ matrix.distro.expected_type }}', got '$DISTRO_TYPE'"
