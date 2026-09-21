@@ -4,6 +4,25 @@ Dokumentasi riwayat pembaruan dan otomasi commit proyek `personal-fresh-linux-se
 
 ---
 
+### 🚀 [2026-09-21 12:36:00] - feat(docs): add high-resolution feature screenshots and update TUI documentation
+
+- **Author**: Rifaul <rifaulhilal06@gmail.com>
+- **Branch**: main
+- **Highlights**:
+  - 📸 **Feature Screenshots (`screenshoots/`)**: High-resolution 960x1080 split view screenshots generated for all 13 interactive TUI features.
+  - 🖼️ **README Sync (`README.md`)**: Embedded pixel-perfect visual previews of all interactive menus into README documentation.
+  - 🛠️ **Automated Capture Tool (`generate_screenshots.py`)**: Script added for automated reproduction of feature screenshots.
+
+- **Author**: Rifaul <rifaulhilal06@gmail.com>
+- **Branch**: main
+- **Highlights**:
+  - ✨ **Presets (`profiles.sh`)**: Minimal Dev, Full Workstation, Gaming & Creator, ASUS ROG Suite.
+  - 🛠️ **Developer Runtimes (`dev_runtimes.sh`)**: `fnm` (Node LTS), `uv` (Python), `rustup` (Cargo), Go, Java (OpenJDK), PHP/Composer.
+  - 📸 **Auto Btrfs / Timeshift Snapshot**: Automatic restore points created before major system tasks and manual snapshot utility.
+  - 📋 **Centralized Logging (`env.sh`, `maintenance.sh`)**: All operations logged to `~/.cache/fresh-linux-setup/setup.log` with execution summary cards and built-in log viewer.
+  - 🔗 **Dotfiles Flexibility (`setup_terminal.sh`)**: Choose between direct copy with timestamped backups, direct symlinking, or GNU Stow integration.
+  - 📹 **Visual Showcase (`assets/vhs/demo.tape`, `scripts/record_demo.sh`)**: Automated terminal demo GIF generation using Charm VHS.
+
 ### 🚀 [2026-09-05 15:24:08] - feat(i18n): add bilingual English and Indonesian support with interactive language selector
 
 - **Author**: Rifaul <rifaulhilal06@gmail.com>

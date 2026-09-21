@@ -27,6 +27,8 @@ CHOICES=$(gum choose --no-limit \
     "$(_msg "System Health Check (Hardware, Services, GPU & Btrfs Status)" "System Health Check (Hardware, Services, GPU & Btrfs Status)")" \
     "$(_msg "Clean Package Caches & Old Kernels (DNF / APT & Flatpak Clean)" "Clean Package Caches & Old Kernels (DNF / APT & Flatpak Clean)")" \
     "$(_msg "Btrfs Scrub & Filesystem Health Check" "Btrfs Scrub & Filesystem Health Check")" \
+    "$(_msg "Buat Snapshot Sistem Manual (Snapper / Timeshift)" "Create Manual System Snapshot (Snapper / Timeshift)")" \
+    "$(_msg "Lihat Log Setup Terpusat (~/.cache/.../setup.log)" "View Centralized Setup Log (~/.cache/.../setup.log)")" \
     "$(_msg "Rollback / Restore Dotfiles dari Backup (~/.dotfiles_backup)" "Rollback / Restore Dotfiles from Backup (~/.dotfiles_backup)")" || true)
 
 if [ -z "$CHOICES" ] || [[ "$CHOICES" == *"Kembali"* ]] || [[ "$CHOICES" == *"Back"* ]]; then
@@ -125,6 +127,26 @@ for task in "${SELECTED_TASKS[@]}"; do
                 fi
             else
                 warn "$(_msg "Btrfs tool tidak ditemukan." "Btrfs tool not found.")"
+            fi
+            ;;
+
+        *"Snapshot Sistem"*|*"System Snapshot"*)
+            echo ""
+            gum style --foreground 99 --bold ">>> $(_msg "Membuat Snapshot Sistem..." "Creating System Snapshot...")"
+            create_system_snapshot "Manual-Maintenance-$(date +%Y%m%d%H%M%S)"
+            ;;
+
+        *"Log Setup"*|*"Setup Log"*)
+            echo ""
+            gum style --foreground 99 --bold ">>> $(_msg "Membuka Log Setup Terpusat..." "Opening Centralized Setup Log...")"
+            if [ -f "$LOG_FILE" ]; then
+                if command -v gum &>/dev/null; then
+                    gum pager < "$LOG_FILE" || cat "$LOG_FILE"
+                else
+                    less "$LOG_FILE" || cat "$LOG_FILE"
+                fi
+            else
+                info "$(_msg "File log belum ditemukan di: $LOG_FILE" "Log file not found at: $LOG_FILE")"
             fi
             ;;
 

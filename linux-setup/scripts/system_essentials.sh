@@ -33,6 +33,10 @@ fi
 
 mapfile -t SELECTED_OPTS <<< "$CHOICES"
 
+if [ ${#SELECTED_OPTS[@]} -gt 0 ]; then
+    create_system_snapshot "Pre-System-Essentials"
+fi
+
 for choice in "${SELECTED_OPTS[@]}"; do
     [ -z "$choice" ] && continue
     case "$choice" in

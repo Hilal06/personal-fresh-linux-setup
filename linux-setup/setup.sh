@@ -13,10 +13,88 @@ chmod +x "$SCRIPT_DIR/scripts/"*.sh
 # 1. Load helper functions & pastikan gum terpasang
 source "$SCRIPT_DIR/scripts/env.sh"
 
+CLI_LANG=""
+CLI_CHECK=false
+CLI_PROFILE=""
+
+show_help() {
+    cat << EOF
+Fresh Linux Setup Suite
+Usage: ./linux-setup/setup.sh [OPTIONS]
+
+Options:
+  -h, --help                Tampilkan pesan bantuan ini / Show this help message
+  --lang <id|en>            Tentukan bahasa langsung / Set language directly
+  --check, --dry-run        Jalankan pre-flight checks tanpa instalasi / Run preflight checks
+  --profile <name>          Jalankan profil preset langsung / Run specific preset profile:
+                            (minimal, workstation, gaming, asus)
+  --list-profiles           Tampilkan daftar profil preset / List available profiles
+EOF
+}
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        --lang)
+            CLI_LANG="$2"
+            shift 2
+            ;;
+        --lang=*)
+            CLI_LANG="${1#*=}"
+            shift
+            ;;
+        --check|--dry-run)
+            CLI_CHECK=true
+            shift
+            ;;
+        --profile)
+            CLI_PROFILE="$2"
+            shift 2
+            ;;
+        --profile=*)
+            CLI_PROFILE="${1#*=}"
+            shift
+            ;;
+        --list-profiles)
+            echo "Available profiles / Profil tersedia:"
+            echo "  - minimal     : Minimal Developer (Zsh, Dev Tools, fnm/Node, uv/Python, Docker, Neovim)"
+            echo "  - workstation : Full Workstation (Dev Tools, Codecs, VA-API, Snapper, Office, GUI Apps)"
+            echo "  - gaming      : Gaming & Creator (Codecs, Steam, Discord, OBS, GameMode, MangoHud)"
+            echo "  - asus        : ASUS ROG / TUF Suite (Dev Tools, Codecs, asusctl, supergfxctl)"
+            exit 0
+            ;;
+        *)
+            shift
+            ;;
+    esac
+done
+
+if [ -n "$CLI_LANG" ]; then
+    export SETUP_LANG="$CLI_LANG"
+    echo "$SETUP_LANG" > /tmp/.setup_lang 2>/dev/null || true
+fi
+
+# Pre-flight Check Mode
+if [ "$CLI_CHECK" = true ]; then
+    run_preflight_checks
+    exit 0
+fi
+
+# Direct Profile Execution Mode
+if [ -n "$CLI_PROFILE" ]; then
+    sudo -v
+    bash -c "source '$SCRIPT_DIR/scripts/env.sh' && setup_environment_repos"
+    bash "$SCRIPT_DIR/scripts/profiles.sh" --preset "$CLI_PROFILE"
+    exit 0
+fi
+
 # Minta kredensial sudo di awal secara interaktif agar tidak membekukan gum spin di latar belakang
 sudo -v
 
-# 2. Layar Pemilihan Bahasa (Muncul sebelum tampilan utama TUI)
+# 2. Layar Pemilihan Bahasa (Muncul jika belum ditentukan via CLI)
 select_language() {
     clear
     echo ""
@@ -51,8 +129,9 @@ select_language() {
     echo "$SETUP_LANG" > /tmp/.setup_lang 2>/dev/null || true
 }
 
-# Tampilkan pemilihan bahasa sebelum masuk dashboard utama
-select_language
+if [ -z "$CLI_LANG" ]; then
+    select_language
+fi
 
 # 3. Bersihkan terminal dan inisialisasi repositori awal
 clear
@@ -94,7 +173,9 @@ while true; do
         --cursor="❯ " \
         --cursor.foreground="212" \
         --header="$(_msg "Pilih modul yang ingin Anda konfigurasi:" "Select module to configure:")" \
+        "🎯  $(_msg "Instalasi Berbasis Profil / Presets (Quick Setup)" "Profile-Based Setup / Presets (Quick Setup)")" \
         "💻  $(_msg "Setup Shell & Terminal (Zsh, Starship, Dotfiles)" "Setup Shell & Terminal (Zsh, Starship, Dotfiles)")" \
+        "🛠️  $(_msg "Install Developer Runtimes (fnm/Node, uv/Python, Rust, Go)" "Install Developer Runtimes (fnm/Node, uv/Python, Rust, Go)")" \
         "⚡  $(_msg "Install System Essentials & Media Codecs" "Install System Essentials & Media Codecs")" \
         "📦  $(_msg "Install Aplikasi Sistem Native (DNF / APT)" "Install Native System Apps (DNF / APT)")" \
         "🚀  $(_msg "Install Aplikasi Flatpak (Flathub)" "Install Flatpak Applications (Flathub)")" \
@@ -120,8 +201,14 @@ while true; do
 
     # Eksekusi modul yang dipilih
     case "$CHOICE" in
+        *"Profil"*|*"Preset"*)
+            "$SCRIPT_DIR/scripts/profiles.sh" || true
+            ;;
         *"Setup Shell & Terminal"*)
             "$SCRIPT_DIR/scripts/setup_terminal.sh" || true
+            ;;
+        *"Developer Runtimes"*)
+            "$SCRIPT_DIR/scripts/dev_runtimes.sh" || true
             ;;
         *"System Essentials"*)
             "$SCRIPT_DIR/scripts/system_essentials.sh" || true

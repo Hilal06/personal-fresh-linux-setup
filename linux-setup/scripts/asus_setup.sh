@@ -10,27 +10,6 @@ set -e
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 source "$SCRIPT_DIR/env.sh"
 
-render_breadcrumb "$(_msg "ASUS ROG / TUF Gaming Utility" "ASUS ROG / TUF Gaming Utility")"
-
-gum style \
-    --foreground 196 --border-foreground 196 --border rounded \
-    --align center --width 64 --padding "1 2" --bold \
-    "ROG & TUF GAMING UTILITY" "$(_msg "ASUS Power, GPU MUX Switch & Perawatan Baterai" "ASUS Power, GPU MUX Switch & Battery Care")"
-
-echo ""
-ACTION=$(gum choose \
-    --cursor="❯ " \
-    --cursor.foreground="196" \
-    --header="$(_msg "Pilih tindakan utilitas ASUS ROG / TUF:" "Select ASUS ROG / TUF action:")" \
-    "⚡  $(_msg "Setup Lengkap (Install Driver, Background Services & Konfigurasi)" "Full Setup (Install Drivers, Background Services & Configure)")" \
-    "⚙️   $(_msg "Hanya Buka Pengaturan (Battery Limit, Profil Daya, GPU Switcher)" "Open Settings Only (Battery Limit, Power Profile, GPU Switcher)")" \
-    "$(_msg "⬅️   [Kembali ke Menu Utama]" "⬅️   [Back to Main Menu]")" || true)
-
-if [ -z "$ACTION" ] || [[ "$ACTION" == *"Kembali"* ]] || [[ "$ACTION" == *"Back"* ]]; then
-    info "$(_msg "Kembali ke Menu Utama..." "Returning to Main Menu...")"
-    exit 0
-fi
-
 # 1. Deteksi Perangkat ASUS
 detect_asus_hardware() {
     local PRODUCT_NAME VENDOR
@@ -255,23 +234,46 @@ configure_asus_settings() {
     done
 }
 
-# Eksekusi Berdasarkan Pilihan
-case "$ACTION" in
-    *"Setup Lengkap"*|*"Full Setup"*)
-        detect_asus_hardware
-        install_asus_packages
-        enable_asus_services
-        if gum confirm "$(_msg "Apakah Anda ingin mengatur konfigurasi profil & baterai ASUS sekarang?" "Do you want to configure ASUS profiles & battery now?")"; then
-            configure_asus_settings
-        fi
-        ;;
-    *"Hanya Buka Pengaturan"*|*"Open Settings Only"*)
-        configure_asus_settings
-        ;;
-esac
+# Eksekusi interaktif jika skrip dijalankan secara langsung
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    render_breadcrumb "$(_msg "ASUS ROG / TUF Gaming Utility" "ASUS ROG / TUF Gaming Utility")"
 
-echo ""
-success "============================================================"
-success "$(_msg " Setup & Konfigurasi ASUS ROG / TUF Selesai!" " ASUS ROG / TUF Setup & Configuration Completed!")"
-success "$(_msg " GUI ROG Control Center dapat dibuka dengan: rog-control-center" " ROG Control Center GUI can be launched via: rog-control-center")"
-success "============================================================"
+    gum style \
+        --foreground 196 --border-foreground 196 --border rounded \
+        --align center --width 64 --padding "1 2" --bold \
+        "ROG & TUF GAMING UTILITY" "$(_msg "ASUS Power, GPU MUX Switch & Perawatan Baterai" "ASUS Power, GPU MUX Switch & Battery Care")"
+
+    echo ""
+    ACTION=$(gum choose \
+        --cursor="❯ " \
+        --cursor.foreground="196" \
+        --header="$(_msg "Pilih tindakan utilitas ASUS ROG / TUF:" "Select ASUS ROG / TUF action:")" \
+        "⚡  $(_msg "Setup Lengkap (Install Driver, Background Services & Konfigurasi)" "Full Setup (Install Drivers, Background Services & Configure)")" \
+        "⚙️   $(_msg "Hanya Buka Pengaturan (Battery Limit, Profil Daya, GPU Switcher)" "Open Settings Only (Battery Limit, Power Profile, GPU Switcher)")" \
+        "$(_msg "⬅️   [Kembali ke Menu Utama]" "⬅️   [Back to Main Menu]")" || true)
+
+    if [ -z "$ACTION" ] || [[ "$ACTION" == *"Kembali"* ]] || [[ "$ACTION" == *"Back"* ]]; then
+        info "$(_msg "Kembali ke Menu Utama..." "Returning to Main Menu...")"
+        exit 0
+    fi
+
+    case "$ACTION" in
+        *"Setup Lengkap"*|*"Full Setup"*)
+            detect_asus_hardware
+            install_asus_packages
+            enable_asus_services
+            if gum confirm "$(_msg "Apakah Anda ingin mengatur konfigurasi profil & baterai ASUS sekarang?" "Do you want to configure ASUS profiles & battery now?")"; then
+                configure_asus_settings
+            fi
+            ;;
+        *"Hanya Buka Pengaturan"*|*"Open Settings Only"*)
+            configure_asus_settings
+            ;;
+    esac
+
+    echo ""
+    success "============================================================"
+    success "$(_msg " Setup & Konfigurasi ASUS ROG / TUF Selesai!" " ASUS ROG / TUF Setup & Configuration Completed!")"
+    success "$(_msg " GUI ROG Control Center dapat dibuka dengan: rog-control-center" " ROG Control Center GUI can be launched via: rog-control-center")"
+    success "============================================================"
+fi

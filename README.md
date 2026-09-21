@@ -22,72 +22,65 @@
 
 ## 🌌 Antarmuka Terminal & Menu Interaktif (TUI)
 
-### 🌐 1. Layar Pemilihan Bahasa (Language Selection Screen)
+Berikut adalah dokumentasi tangkapan layar (screenshot) beresolusi tinggi (setengah layar / split view 960x1080) untuk setiap fitur antarmuka TUI interaktif:
 
-Saat utilitas pertama kali dijalankan, sistem menyajikan layar pemilihan bahasa sebelum membuka dashboard utama:
+<p align="center">
+  <img src="screenshoots/01_language_selection.png" alt="Layar Pemilihan Bahasa" width="48%">
+  <img src="screenshoots/02_main_dashboard.png" alt="Dashboard Utama" width="48%">
+</p>
 
-```text
-╭──────────────────────────────────────────────────────────────────╮
-│                   █░█ █ █░░ ▄▀█ █░░ █▀█ █▄▄                      │
-│                   █▀█ █ █▄▄ █▀█ █▄▄ █▄█ █▄█                      │
-│                                                                  │
-│                     Fresh Linux Setup Suite                      │
-│               Language Selection • Pemilihan Bahasa              │
-╰──────────────────────────────────────────────────────────────────╯
- [↑/↓] Select / Pilih • [Enter] Confirm / Konfirmasi
+<p align="center">
+  <img src="screenshoots/03_profiles_presets.png" alt="Presets Cepat & Profil Developer" width="48%">
+  <img src="screenshoots/04_setup_terminal.png" alt="Setup Shell & Terminal" width="48%">
+</p>
 
- Choose your preferred language / Pilih bahasa yang digunakan:
- ❯ 🇮🇩  Bahasa Indonesia (Default)
-   🇬🇧  English (International)
-```
+<p align="center">
+  <img src="screenshoots/05_dev_runtimes.png" alt="Developer Runtimes" width="48%">
+  <img src="screenshoots/06_system_essentials.png" alt="System Essentials & Codecs" width="48%">
+</p>
 
-### 🖥️ 2. Main Dashboard & System Overview
+<p align="center">
+  <img src="screenshoots/07_rpm_apps.png" alt="Aplikasi Sistem Native" width="48%">
+  <img src="screenshoots/08_flatpak_apps.png" alt="Aplikasi Flatpak" width="48%">
+</p>
 
-```text
-╭──────────────────────────────────────────────────────────────────╮
-│                   █░█ █ █░░ ▄▀█ █░░ █▀█ █▄▄                      │
-│                   █▀█ █ █▄▄ █▀█ █▄▄ █▄█ █▄█                      │
-│                                                                  │
-│                     Fresh Linux Setup Suite                      │
-│           Personal System Setup & Automation Dashboard           │
-│                                                                  │
-│       OS: Fedora Linux 44 (KDE Plasma) • Kernel: 6.13...         │
-│             User: faulfedora@asus • Distro Target: FEDORA        │
-╰──────────────────────────────────────────────────────────────────╯
- [↑/↓] Navigasi Pilihan • [Enter] Buka Modul • [Esc] Keluar
+<p align="center">
+  <img src="screenshoots/09_asus_setup.png" alt="ASUS ROG / TUF Utilities" width="48%">
+  <img src="screenshoots/10_git_ssh_setup.png" alt="Git Identity & SSH Key" width="48%">
+</p>
 
- ❯ 💻  Setup Shell & Terminal (Zsh, Starship, Dotfiles)
-   ⚡  Install System Essentials & Media Codecs
-   📦  Install Aplikasi Sistem Native (DNF / APT)
-   🚀  Install Aplikasi Flatpak (Flathub)
-   🎮  Setup & Konfigurasi ASUS ROG / TUF Utilities
-   🔑  Setup Identitas Git & SSH Key Developer
-   🩺  System Maintenance & Health Check (Rollback Dotfiles)
-   🌐  Ganti Bahasa / Change Language
-   ────────────────────────────────────────────────────────────
-   🚪  Keluar / Selesai (Exit)
-```
+<p align="center">
+  <img src="screenshoots/11_system_maintenance.png" alt="System Maintenance" width="48%">
+  <img src="screenshoots/12_asus_settings_subscreen.png" alt="ASUS Hardware Settings" width="48%">
+</p>
 
-### 🧭 3. Alur Sub-Menu & Tombol Kembali (Breadcrumb Navigation)
+<p align="center">
+  <img src="screenshoots/13_health_check_summary.png" alt="System Health Diagnostic" width="60%">
+</p>
 
-Setiap sub-menu dilengkapi breadcrumb pelacak hierarki dan opsi eksplisit `[⬅️ Kembali ke Menu Utama]` di baris teratas:
+### 🎯 Detail Fitur & Profil
 
-```text
-🧭 Menu Utama > System Essentials & Media Codecs
-╭────────────────────────────────────────────────────────────────╮
-│                  SYSTEM ESSENTIALS & CODECS                    │
-│       Multimedia, Btrfs Snapshots & Desktop Optimization       │
-╰────────────────────────────────────────────────────────────────╯
- [↑/↓] Navigasi • [Spasi] Pilih / Batal Centang • [Enter] Konfirmasi • [Esc] Kembali
+- **Quick Presets (`profiles.sh`)**:
+  - 💻 **Minimal Developer**: Zsh, Starship, FiraCode Font, Dev Tools (gcc/make/cmake), `fnm` (Node LTS), `uv` (Python), Docker Engine & Compose, Neovim, Fastfetch, Git & SSH.
+  - 🎨 **Full Workstation**: Minimal Dev + Codecs, VA-API, Snapper, Tuned/Thermald, VS Code, BTop, BleachBit, EasyEffects, Flatseal, dan Flatpaks (VLC, Spotube, ONLYOFFICE, Pika Backup).
+  - 🎮 **Gaming & Creator**: Multimedia Codecs, Mesa Freeworld, Feral GameMode, MangoHud overlay, Steam, Discord, OBS Studio, VLC.
+  - ⚡ **ASUS ROG / TUF Suite**: Minimal Dev + System Essentials + asusctl, supergfxctl, dan Battery Charge Limit 80%.
+- **Modern Runtimes (`dev_runtimes.sh`)**:
+  - `fnm` (Fast Node Manager) + Node.js LTS + pnpm
+  - `uv` (Ultra-fast Astral Python Manager) + Python
+  - `rustup` & `cargo`
+  - `golang` official compiler & toolchain
+  - Java OpenJDK LTS & PHP/Composer
+- **Auto Btrfs & Timeshift Snapshot**: Membuat snapshot restore point otomatis sebelum eksekusi paket besar.
+- **Centralized Logging**: Seluruh output proses dicatat ke `~/.cache/fresh-linux-setup/setup.log` dilengkapi kartu ringkasan status di akhir sesi.
 
- ❯ • ⬅️   [Kembali ke Menu Utama]
-   • Multimedia Codecs Lengkap (FFmpeg, GStreamer, libdvdcss, Audio/Video Extras)
-   • Hardware Video Acceleration / Drivers (VA-API, Mesa Freeworld, Intel/AMD)
-   • System Utilities & Compression (p7zip, unrar, tar, rsync, lshw, pciutils)
-   • KDE Plasma Enhancements (KDE Connect, Flatpak KCM integration)
-   • Btrfs Assistant & Snapper (GUI Snapshot, Maintenance, Subvolume Management)
-   • System Performance & Thermal Tuning (thermald, tuned, preload)
-   • Kernel & Sysctl Desktop Tuning (ZRAM Swappiness, File Watcher Handles)
+### 📹 Perekaman Demo Terminal (Charm VHS)
+
+Rekam demo navigasi terminal interaktif beresolusi tinggi secara otomatis menggunakan [Charm VHS](https://github.com/charmbracelet/vhs):
+
+```bash
+# Jalankan helper perekam VHS:
+./scripts/record_demo.sh
 ```
 
 ---
@@ -226,12 +219,14 @@ personal-fresh-linux-setup/
 │   ├── setup.sh                 # 🚀 Entry point utama (Interactive TUI Launcher)
 │   ├── README.md                # Dokumentasi spesifik modul setup
 │   ├── scripts/
-│   │   ├── env.sh               # Deteksi OS, repository environment & gum installer
-│   │   ├── setup_terminal.sh    # Setup Zsh, Starship, plugins, CLI tools, FiraCode & font
+│   │   ├── env.sh               # Deteksi OS, centralized logging, & snapshot helper
+│   │   ├── profiles.sh          # Quick Profiles & Presets installer
+│   │   ├── setup_terminal.sh    # Setup Zsh, Starship, plugins, CLI tools, FiraCode & GNU Stow/Symlink
+│   │   ├── dev_runtimes.sh      # Modern Runtimes (fnm, uv, rustup, go, java, php)
 │   │   ├── git_ssh_setup.sh     # Setup Git user identity, ed25519 SSH key & clipboard
 │   │   ├── system_essentials.sh # Multimedia codecs, hardware acceleration, Btrfs & tuning
 │   │   ├── asus_setup.sh        # Setup ASUS ROG/TUF battery, fan profiles & GPU switcher
-│   │   ├── maintenance.sh       # Diagnostik sistem, pembersihan cache, & rollback dotfiles
+│   │   ├── maintenance.sh       # Diagnostik sistem, pembersihan cache, rollback & snapshot
 │   │   ├── rpm_apps.sh          # Menu TUI instalasi aplikasi native sistem (DNF / APT)
 │   │   ├── flatpak_apps.sh      # Menu TUI instalasi aplikasi sandboxed (Flathub)
 │   │   └── zsh.sh               # Wrapper kompatibilitas ke setup_terminal.sh
@@ -241,8 +236,12 @@ personal-fresh-linux-setup/
 │   │   └── bigtext.txt          # ASCII Art Banner Header
 │   └── docs/
 │       └── software-development-list.txt # Inventaris software pendukung
+├── assets/
+│   └── vhs/
+│       └── demo.tape            # Tape rekaman visual terminal Charm VHS
 ├── scripts/
-│   └── git-sync.sh              # 🤖 Otomasi Commit, Changelog & Push ke GitHub
+│   ├── git-sync.sh              # 🤖 Otomasi Commit, Changelog & Push ke GitHub
+│   └── record_demo.sh           # 📹 Generator rekaman demo terminal GIF via VHS
 ├── .github/
 │   └── workflows/
 │       └── ci.yml               # 🧪 GitHub Actions: ShellCheck, Docker Matrix & Tests
@@ -259,6 +258,14 @@ personal-fresh-linux-setup/
 ## 📜 Riwayat Pembaruan Terkini (Latest Changelog Highlights)
 
 Berikut adalah rangkuman pembaruan versi terbaru. Untuk riwayat selengkapnya, silakan baca berkas [CHANGELOG.md](CHANGELOG.md).
+
+> ### ⚡ `v2026.09.08` - Presets, Developer Runtimes, Auto-Snapshot & VHS Showcase
+> - **Quick Setup Profiles / Presets (`profiles.sh`)**: 4 profil instalasi cepat satu-klik (*Minimal Developer*, *Full Workstation*, *Gaming & Creator*, *ASUS ROG Suite*).
+> - **Modern Developer Runtimes (`dev_runtimes.sh`)**: Manajemen runtime modern (`fnm` + Node LTS, `uv` + Python, `rustup` + Cargo, Go compiler, OpenJDK LTS, PHP/Composer).
+> - **Auto Btrfs & Timeshift Snapshot**: Pembuatan snapshot pemulihan sistem otomatis sebelum eksekusi modul besar.
+> - **Centralized Logging & Diagnostics (`setup.log`)**: Logging otomatis di `~/.cache/fresh-linux-setup/setup.log` beserta ringkasan kartu status.
+> - **Fleksibilitas Dotfiles**: Dukungan salin fisik, direct symbolic link, dan integrasi GNU Stow.
+> - **Charm VHS Recording Suite**: Setup rekaman demo GIF resolusi tinggi di `assets/vhs/demo.tape` & `scripts/record_demo.sh`.
 
 > ### 🌐 `v2026.09.05` - Full Bilingual English & Indonesian TUI Support
 > - **Language Selector Screen**: Layar pemilihan bahasa interaktif sebelum masuk ke tampilan utama dashboard (`select_language()`).

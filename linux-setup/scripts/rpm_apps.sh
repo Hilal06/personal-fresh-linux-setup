@@ -36,6 +36,10 @@ fi
 
 mapfile -t SELECTED_APPS <<< "$CHOICES"
 
+if [ ${#SELECTED_APPS[@]} -gt 0 ]; then
+    create_system_snapshot "Pre-Native-Apps"
+fi
+
 for choice in "${SELECTED_APPS[@]}"; do
     [ -z "$choice" ] && continue
     case "$choice" in

@@ -12,28 +12,6 @@ CONFIGS_DIR="$SCRIPT_DIR/../configs"
 # Load environment & helper functions (info, success, warn, error, gum)
 source "$SCRIPT_DIR/env.sh"
 
-render_breadcrumb "$(_msg "Setup Shell & Terminal Workspace" "Shell & Terminal Workspace Setup")"
-
-gum style \
-    --foreground 45 --border-foreground 45 --border rounded \
-    --align center --width 64 --padding "1 2" --bold \
-    "TERMINAL & SHELL WORKSPACE" "$(_msg "Zsh, Starship, FiraCode Nerd Font & Dotfiles" "Zsh, Starship, FiraCode Nerd Font & Dotfiles")"
-
-echo ""
-ACTION=$(gum choose \
-    --cursor="❯ " \
-    --cursor.foreground="45" \
-    --header="$(_msg "Pilih mode setup terminal:" "Select terminal setup mode:")" \
-    "🚀  $(_msg "Jalankan Setup Lengkap (CLI Tools, Font, Plugins, Dotfiles)" "Run Full Setup (CLI Tools, Font, Plugins, Dotfiles)")" \
-    "🎨  $(_msg "Hanya Terapkan Dotfiles (~/.zshrc & starship.toml)" "Apply Dotfiles Only (~/.zshrc & starship.toml)")" \
-    "🔤  $(_msg "Hanya Install FiraCode Nerd Font & Konfigurasi Profil Terminal" "Install FiraCode Nerd Font & Configure Terminal Profile Only")" \
-    "$(_msg "⬅️   [Kembali ke Menu Utama]" "⬅️   [Back to Main Menu]")" || true)
-
-if [ -z "$ACTION" ] || [[ "$ACTION" == *"Kembali"* ]] || [[ "$ACTION" == *"Back"* ]]; then
-    info "$(_msg "Kembali ke Menu Utama..." "Returning to Main Menu...")"
-    exit 0
-fi
-
 # 1. Install CLI Tools & Starship
 install_cli_tools() {
     info "Menginstall CLI tools (zsh, git, curl, fzf, bat, eza, fd-find, zoxide, util-linux)..."
@@ -199,15 +177,28 @@ setup_plugins() {
     success "Semua plugin Zsh siap digunakan."
 }
 
+# Helper instalasi GNU Stow jika diperlukan
+ensure_stow_installed() {
+    if ! command -v stow &>/dev/null; then
+        info "$(_msg "Menginstall GNU Stow..." "Installing GNU Stow...")"
+        if [ "$DISTRO_TYPE" = "fedora" ]; then
+            sudo dnf install -y stow
+        elif [ "$DISTRO_TYPE" = "ubuntu" ]; then
+            sudo apt-get install -y stow
+        fi
+    fi
+}
+
 # 4. Setup Konfigurasi Starship (~/.config/starship.toml)
 deploy_starship_config() {
+    local MODE="${1:-copy}"
     local SOURCE_STARSHIP="$CONFIGS_DIR/starship.toml"
     local TARGET_STARSHIP="$HOME/.config/starship.toml"
     local BACKUP_DIR="$HOME/.dotfiles_backup"
 
     mkdir -p "$HOME/.config" "$BACKUP_DIR"
 
-    if [ -f "$TARGET_STARSHIP" ]; then
+    if [ -f "$TARGET_STARSHIP" ] && [ ! -L "$TARGET_STARSHIP" ]; then
         local TIMESTAMP
         TIMESTAMP="$(date +%Y%m%d%H%M%S)"
         local BACKUP_STARSHIP="$BACKUP_DIR/starship.toml.backup.$TIMESTAMP"
@@ -217,8 +208,14 @@ deploy_starship_config() {
     fi
 
     if [ -f "$SOURCE_STARSHIP" ]; then
-        cp "$SOURCE_STARSHIP" "$TARGET_STARSHIP"
-        success "Konfigurasi Starship (~/.config/starship.toml) berhasil diterapkan."
+        rm -f "$TARGET_STARSHIP"
+        if [ "$MODE" = "symlink" ]; then
+            ln -sf "$SOURCE_STARSHIP" "$TARGET_STARSHIP"
+            success "Symlink Starship (~/.config/starship.toml -> $SOURCE_STARSHIP) berhasil dibuat."
+        else
+            cp "$SOURCE_STARSHIP" "$TARGET_STARSHIP"
+            success "Konfigurasi Starship (~/.config/starship.toml) berhasil diterapkan."
+        fi
     else
         warn "File konfigurasi $SOURCE_STARSHIP tidak ditemukan."
     fi
@@ -226,13 +223,14 @@ deploy_starship_config() {
 
 # 5. Setup Konfigurasi Zsh (~/.zshrc)
 deploy_zshrc_config() {
+    local MODE="${1:-copy}"
     local SOURCE_ZSHRC="$CONFIGS_DIR/.zshrc"
     local TARGET_ZSHRC="$HOME/.zshrc"
     local BACKUP_DIR="$HOME/.dotfiles_backup"
 
     mkdir -p "$HOME/ZoxideBackup" "$BACKUP_DIR"
 
-    if [ -f "$TARGET_ZSHRC" ]; then
+    if [ -f "$TARGET_ZSHRC" ] && [ ! -L "$TARGET_ZSHRC" ]; then
         local TIMESTAMP
         TIMESTAMP="$(date +%Y%m%d%H%M%S)"
         local BACKUP_ZSHRC="$BACKUP_DIR/.zshrc.backup.$TIMESTAMP"
@@ -242,11 +240,73 @@ deploy_zshrc_config() {
     fi
 
     if [ -f "$SOURCE_ZSHRC" ]; then
-        cp "$SOURCE_ZSHRC" "$TARGET_ZSHRC"
-        success "Konfigurasi ~/.zshrc berhasil diterapkan."
+        rm -f "$TARGET_ZSHRC"
+        if [ "$MODE" = "symlink" ]; then
+            ln -sf "$SOURCE_ZSHRC" "$TARGET_ZSHRC"
+            success "Symlink ~/.zshrc (-> $SOURCE_ZSHRC) berhasil dibuat."
+        else
+            cp "$SOURCE_ZSHRC" "$TARGET_ZSHRC"
+            success "Konfigurasi ~/.zshrc berhasil diterapkan."
+        fi
     else
         warn "File konfigurasi $SOURCE_ZSHRC tidak ditemukan."
     fi
+}
+
+# Deploy dengan GNU Stow
+deploy_with_stow() {
+    ensure_stow_installed
+    local STOW_DIR="$CONFIGS_DIR/stow"
+    local PKG_DIR="$STOW_DIR/profile"
+    mkdir -p "$PKG_DIR/.config"
+
+    cp -f "$CONFIGS_DIR/.zshrc" "$PKG_DIR/.zshrc"
+    cp -f "$CONFIGS_DIR/starship.toml" "$PKG_DIR/.config/starship.toml"
+
+    local BACKUP_DIR="$HOME/.dotfiles_backup"
+    local TIMESTAMP
+    TIMESTAMP="$(date +%Y%m%d%H%M%S)"
+    mkdir -p "$BACKUP_DIR"
+
+    if [ -f "$HOME/.zshrc" ] && [ ! -L "$HOME/.zshrc" ]; then
+        cp "$HOME/.zshrc" "$BACKUP_DIR/.zshrc.backup.$TIMESTAMP"
+        cp "$HOME/.zshrc" "$BACKUP_DIR/.zshrc.latest"
+        rm -f "$HOME/.zshrc"
+    fi
+    if [ -f "$HOME/.config/starship.toml" ] && [ ! -L "$HOME/.config/starship.toml" ]; then
+        cp "$HOME/.config/starship.toml" "$BACKUP_DIR/starship.toml.backup.$TIMESTAMP"
+        cp "$HOME/.config/starship.toml" "$BACKUP_DIR/starship.toml.latest"
+        rm -f "$HOME/.config/starship.toml"
+    fi
+
+    stow -R -d "$STOW_DIR" -t "$HOME" profile
+    success "$(_msg "Dotfiles berhasil di-link menggunakan GNU Stow!" "Dotfiles successfully linked using GNU Stow!")"
+}
+
+# Menu Interaktif Pemilihan Mode Deployment Dotfiles
+deploy_dotfiles_interactive() {
+    local METHOD
+    info "$(_msg "Pilih metode deployment dotfiles:" "Select dotfiles deployment method:")"
+    METHOD=$(gum choose \
+        --cursor="❯ " \
+        --cursor.foreground="45" \
+        "$(_msg "📋 Salin Fisik (Copy dengan riwayat backup timestamp)" "📋 Direct Copy (with timestamped backup history)")" \
+        "$(_msg "🔗 Symbolic Link (Tautkan langsung file ke repositori ini)" "🔗 Symbolic Link (Symlink directly to this repository)")" \
+        "$(_msg "📦 GNU Stow (Kelola via paket symlink GNU Stow)" "📦 GNU Stow (Manage via GNU Stow symlink package)")" || true)
+
+    case "$METHOD" in
+        *"Symbolic Link"*|*"Symlink"*)
+            deploy_starship_config "symlink"
+            deploy_zshrc_config "symlink"
+            ;;
+        *"GNU Stow"*)
+            deploy_with_stow
+            ;;
+        *)
+            deploy_starship_config "copy"
+            deploy_zshrc_config "copy"
+            ;;
+    esac
 }
 
 # 6. Ubah Default Shell ke Zsh
@@ -260,17 +320,15 @@ set_default_shell() {
             sudo chsh -s "$ZSH_PATH" "$USER" || warn "Gagal menjalankan chsh otomatis. Silakan jalankan 'chsh -s $(which zsh)' manual."
             success "Default shell berhasil diubah ke Zsh."
         else
-            info "Melewati penggantian default shell."
+            info "Default shell tidak diubah."
         fi
-    else
-        info "Zsh sudah menjadi default shell aktif atau belum terpasang."
     fi
 }
 
-# 7. Konfigurasi Git Identity & SSH Key Generator
+# 7. Setup Konfigurasi Git & SSH (Opsional)
 configure_git_and_ssh() {
     if [ -f "$SCRIPT_DIR/git_ssh_setup.sh" ]; then
-        if gum confirm "$(_msg "Apakah Anda ingin mengonfigurasi identitas Git & generate SSH Key (GitHub)?" "Do you want to configure Git identity & generate SSH Key (GitHub)?")"; then
+        if gum confirm "$(_msg "Apakah Anda ingin mengonfigurasi identitas Git & SSH Key sekarang?" "Do you want to configure Git identity & SSH Key now?")"; then
             bash "$SCRIPT_DIR/git_ssh_setup.sh"
         else
             info "Melewati konfigurasi Git & SSH."
@@ -278,36 +336,58 @@ configure_git_and_ssh() {
     fi
 }
 
-# Eksekusi Berdasarkan Pilihan
-case "$ACTION" in
-    *"Setup Lengkap"*|*"Full Setup"*)
-        install_cli_tools
-        install_firacode_nerd_font
-        setup_plugins
+# Eksekusi interaktif jika skrip dijalankan secara langsung
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    render_breadcrumb "$(_msg "Setup Shell & Terminal Workspace" "Shell & Terminal Workspace Setup")"
 
-        if gum confirm "$(_msg "Terapkan file konfigurasi dotfiles (starship.toml & .zshrc)?" "Apply dotfiles configuration files (starship.toml & .zshrc)?")"; then
-            deploy_starship_config
-            deploy_zshrc_config
-        else
-            info "Melewati penyalinan dotfiles terminal."
-        fi
+    gum style \
+        --foreground 45 --border-foreground 45 --border rounded \
+        --align center --width 64 --padding "1 2" --bold \
+        "TERMINAL & SHELL WORKSPACE" "$(_msg "Zsh, Starship, FiraCode Nerd Font & Dotfiles" "Zsh, Starship, FiraCode Nerd Font & Dotfiles")"
 
-        configure_git_and_ssh
-        set_default_shell
-        ;;
+    echo ""
+    ACTION=$(gum choose \
+        --cursor="❯ " \
+        --cursor.foreground="45" \
+        --header="$(_msg "Pilih mode setup terminal:" "Select terminal setup mode:")" \
+        "🚀  $(_msg "Jalankan Setup Lengkap (CLI Tools, Font, Plugins, Dotfiles)" "Run Full Setup (CLI Tools, Font, Plugins, Dotfiles)")" \
+        "🎨  $(_msg "Hanya Terapkan Dotfiles (~/.zshrc & starship.toml)" "Apply Dotfiles Only (~/.zshrc & starship.toml)")" \
+        "🔤  $(_msg "Hanya Install FiraCode Nerd Font & Konfigurasi Profil Terminal" "Install FiraCode Nerd Font & Configure Terminal Profile Only")" \
+        "$(_msg "⬅️   [Kembali ke Menu Utama]" "⬅️   [Back to Main Menu]")" || true)
 
-    *"Dotfiles"*)
-        deploy_starship_config
-        deploy_zshrc_config
-        ;;
+    if [ -z "$ACTION" ] || [[ "$ACTION" == *"Kembali"* ]] || [[ "$ACTION" == *"Back"* ]]; then
+        info "$(_msg "Kembali ke Menu Utama..." "Returning to Main Menu...")"
+        exit 0
+    fi
 
-    *"FiraCode"*)
-        install_firacode_nerd_font
-        ;;
-esac
+    case "$ACTION" in
+        *"Setup Lengkap"*|*"Full Setup"*)
+            install_cli_tools
+            install_firacode_nerd_font
+            setup_plugins
 
-echo ""
-success "============================================================"
-success "$(_msg " Setup Terminal & Shell Modern Selesai!" " Terminal & Shell Modern Setup Completed!")"
-success "$(_msg " Silakan restart terminal atau jalankan: exec zsh" " Please restart your terminal or run: exec zsh")"
-success "============================================================"
+            if gum confirm "$(_msg "Terapkan file konfigurasi dotfiles (starship.toml & .zshrc)?" "Apply dotfiles configuration files (starship.toml & .zshrc)?")"; then
+                deploy_dotfiles_interactive
+            else
+                info "Melewati penyalinan dotfiles terminal."
+            fi
+
+            configure_git_and_ssh
+            set_default_shell
+            ;;
+
+        *"Dotfiles"*)
+            deploy_dotfiles_interactive
+            ;;
+
+        *"FiraCode"*)
+            install_firacode_nerd_font
+            ;;
+    esac
+
+    echo ""
+    success "============================================================"
+    success "$(_msg " Setup Terminal & Shell Modern Selesai!" " Terminal & Shell Modern Setup Completed!")"
+    success "$(_msg " Silakan restart terminal atau jalankan: exec zsh" " Please restart your terminal or run: exec zsh")"
+    success "============================================================"
+fi

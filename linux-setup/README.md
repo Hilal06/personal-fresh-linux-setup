@@ -3,9 +3,13 @@
 Skrip otomasi modular untuk melakukan post-installation setup dan konfigurasi sistem operasi **Fedora Workstation** dan **Ubuntu (KDE / GNOME)**. Dibuat untuk mempercepat proses bootstrap sistem dengan instalasi package RPM/APT, Flatpak, dan konfigurasi terminal Zsh modern.
 
 ## 🚀 Fitur Utama
+- **Instalasi Cepat Berbasis Profil (Presets)**: Pilihan bundle instalasi satu-klik: *Minimal Developer*, *Full Workstation*, *Gaming & Creator*, dan *ASUS ROG / TUF Suite*.
+- **Modern Developer Language Runtimes**: Pemasangan modern version managers: Node.js via `fnm` (Fast Node Manager), Python via `uv` (Astral), Rust (`rustup` & `cargo`), Go, OpenJDK LTS, dan PHP/Composer.
+- **Auto Btrfs / Timeshift Snapshot**: Pembuatan snapshot restore point otomatis sebelum operasi sistem besar via Snapper atau Timeshift.
+- **Logging Terpusat & Diagnostik Eksekusi (`setup.log`)**: Log instalasi tersimpan rapi di `~/.cache/fresh-linux-setup/setup.log` dilengkapi kartu ringkasan status sukses/gagal di akhir sesi.
+- **Fleksibilitas Dotfiles (Copy, Symlink, GNU Stow)**: Pilihan metode deployment file konfigurasi (`.zshrc`, `starship.toml`) baik salin fisik dengan backup timestamp, symbolic link langsung, atau terintegrasi GNU Stow.
 - **Dukungan Dwi-Bahasa (Bilingual ID & EN)**: Dilengkapi layar pemilihan bahasa (`select_language()`) sebelum masuk dashboard utama, in-menu language switcher, dan lokalisasi menyeluruh ke Bahasa Indonesia & English di setiap modul.
 - **Interaktif TUI Dashboard Loop**: Menggunakan [Charmbracelet Gum](https://github.com/charmbracelet/gum) untuk tampilan menu interaktif yang estetik, berjalan dalam dashboard loop persisten dengan dynamic system status badge, indikator breadcrumb, tombol `[⬅️ Kembali ke Menu Utama]` di setiap sub-menu, dan safe `Esc` cancel handling.
-- **Modular & Fleksibel**: Skrip dipecah menjadi beberapa bagian (Environment, System Essentials & Codecs, Zsh, RPM Apps, Flatpak Apps).
 - **Environment & Repositori**: Menambahkan RPM Fusion (Free, Non-Free, & Tainted) serta Flathub secara otomatis.
 - **Multimedia & Codecs Lengkap**: Menginstal FFmpeg lengkap, GStreamer plugins, dan libdvdcss dari RPM Fusion.
 - **Hardware Acceleration**: Mengonfigurasi driver akselerasi video hardware (VA-API / VDPAU Mesa Freeworld, Intel, AMD).
@@ -20,7 +24,7 @@ Skrip otomasi modular untuk melakukan post-installation setup dan konfigurasi si
 - **Optimasi Kecepatan DNF**: Otomatis mengatur `max_parallel_downloads=10`, `fastestmirror=True`, dan `defaultyes=True` pada `/etc/dnf/dnf.conf`.
 - **Auto-Config Font Terminal**: Otomatis menyetel profil KDE Konsole dan GNOME Terminal ke `FiraCode Nerd Font`.
 - **Safe Dotfiles Backup & Timestamped Rollback**: Backup terpusat ke direktori `~/.dotfiles_backup/` dengan opsi rollback riwayat backup berdasarkan timestamp secara interaktif.
-- **System Maintenance & Health Check**: Skrip diagnostik untuk mengecek baterai, status GPU, memory/zram, service status, membersihkan cache paket lama, dan health check filesystem Btrfs.
+- **System Maintenance & Health Check**: Skrip diagnostik untuk mengecek baterai, status GPU, memory/zram, service status, membersihkan cache paket lama, manual snapshot, dan log viewer.
 - **Aplikasi Esensial & Produktivitas**: Pilihan cepat untuk menginstal Google Antigravity (CLI `agy` & IDE Desktop), ONLYOFFICE, Spotube, VLC, Pika Backup, Docker, VSCode, Neovim, Google Chrome, Discord, DBeaver, Bruno, dll.
 
 ## 📁 Struktur Direktori
@@ -29,13 +33,15 @@ linux-setup/
 ├── setup.sh                 # Skrip eksekusi utama (Main Entry Point)
 ├── README.md                # Dokumentasi proyek
 ├── scripts/
-│   ├── env.sh               # Konfigurasi repository (RPM Fusion, Flathub) & package manager check
-│   ├── setup_terminal.sh    # Setup Zsh, Starship, plugins, CLI tools, FiraCode & font terminal
+│   ├── env.sh               # Konfigurasi repositori, logging terpusat, & snapshot helper
+│   ├── profiles.sh          # Quick Profiles / Presets installer
+│   ├── setup_terminal.sh    # Setup Zsh, Starship, plugins, CLI tools, FiraCode & GNU Stow/Symlink
+│   ├── dev_runtimes.sh      # Modern Runtimes (fnm, uv, rustup, go, java, php)
 │   ├── git_ssh_setup.sh     # Setup Git user identity, ed25519 SSH key & clipboard integration
 │   ├── zsh.sh               # Wrapper kompatibilitas ke setup_terminal.sh
 │   ├── system_essentials.sh # Multimedia codecs, hardware acceleration, Btrfs & desktop tools
 │   ├── asus_setup.sh        # Setup & konfigurasi ASUS ROG / TUF gaming tools
-│   ├── maintenance.sh       # Diagnostik kesehatan sistem, pembersihan cache, & rollback dotfiles
+│   ├── maintenance.sh       # Diagnostik kesehatan sistem, pembersihan cache, rollback & snapshot
 │   ├── rpm_apps.sh          # Menu TUI instalasi aplikasi native (DNF / APT)
 │   └── flatpak_apps.sh      # Menu TUI instalasi aplikasi via Flatpak
 ├── configs/
