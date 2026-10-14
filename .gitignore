@@ -3,4 +3,14 @@
 .env.local
 *.backup.*
 *.latest
-.agents/plugins/project-mcp-tools/mcp_config.json
+# AI Agents & Assistants (Local development only)
+.agents/
+AGENTS.md
+CLAUDE.md
+.claude/
+.gemini/
+.cursor/
+.windsurf/
+.roo/
+.cline/
+.copilot/
