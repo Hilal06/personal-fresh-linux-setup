@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -eo pipefail
 
 # ==============================================================================
 # Environment Setup & Helpers
@@ -16,6 +16,31 @@ NC='\033[0m'
 LOG_DIR="${HOME}/.cache/fresh-linux-setup"
 LOG_FILE="${LOG_DIR}/setup.log"
 mkdir -p "$LOG_DIR" 2>/dev/null || true
+chmod 700 "$LOG_DIR" 2>/dev/null || true
+
+# Safe HTTPS Download Helper (TLS 1.2+, HTTPS enforcement, retry & timeout)
+safe_download() {
+    local url="$1"
+    local dest="$2"
+    if ! curl --proto '=https' --tlsv1.2 -fsSL --retry 3 --connect-timeout 10 -o "$dest" "$url"; then
+        warn "Gagal mengunduh $url (periksa koneksi atau URL)."
+        return 1
+    fi
+    if [ ! -s "$dest" ]; then
+        warn "Hasil unduhan kosong untuk $url"
+        return 1
+    fi
+    return 0
+}
+
+# Create a secured temporary directory with restricted permissions (0700)
+create_secure_tmp() {
+    local prefix="${1:-fresh-setup}"
+    local tmp_dir
+    tmp_dir="$(mktemp -d -t "${prefix}.XXXXXX")"
+    chmod 700 "$tmp_dir"
+    echo "$tmp_dir"
+}
 
 _log_to_file() {
     local level="$1"
@@ -168,6 +193,12 @@ run_preflight_checks() {
 }
 
 # Language / i18n helper (Default: id)
+LANG_STATE_FILE="${LOG_DIR}/.setup_lang"
+if [ -f "$LANG_STATE_FILE" ]; then
+    SETUP_LANG="$(cat "$LANG_STATE_FILE" 2>/dev/null || echo 'id')"
+elif [ -f /tmp/.setup_lang ]; then
+    SETUP_LANG="$(cat /tmp/.setup_lang 2>/dev/null || echo 'id')"
+fi
 export SETUP_LANG="${SETUP_LANG:-id}"
 
 _msg() {
@@ -220,11 +251,14 @@ ensure_gum_installed() {
             sudo apt-get update -qq >/dev/null 2>&1 || true
             sudo apt-get install -y -qq gum >/dev/null 2>&1 || {
                 local GUM_TEMP
-                GUM_TEMP="$(mktemp -d)"
-                curl -fsSL https://github.com/charmbracelet/gum/releases/latest/download/gum_linux_amd64.tar.gz -o "$GUM_TEMP/gum.tar.gz" 2>/dev/null || true
-                if [ -s "$GUM_TEMP/gum.tar.gz" ]; then
-                    tar -xzf "$GUM_TEMP/gum.tar.gz" -C "$GUM_TEMP"
-                    sudo cp "$GUM_TEMP"/gum_*_linux_amd64/gum /usr/local/bin/ 2>/dev/null || sudo cp "$GUM_TEMP/gum" /usr/local/bin/ 2>/dev/null || true
+                GUM_TEMP="$(create_secure_tmp "gum-setup")"
+                if safe_download "https://github.com/charmbracelet/gum/releases/latest/download/gum_linux_amd64.tar.gz" "$GUM_TEMP/gum.tar.gz"; then
+                    tar -xzf "$GUM_TEMP/gum.tar.gz" -C "$GUM_TEMP" --no-same-owner
+                    local GUM_BIN
+                    GUM_BIN="$(find "$GUM_TEMP" -maxdepth 2 -type f -name gum | head -n 1)"
+                    if [ -n "$GUM_BIN" ] && [ -f "$GUM_BIN" ]; then
+                        sudo install -m 0755 "$GUM_BIN" /usr/local/bin/gum
+                    fi
                 fi
                 rm -rf "$GUM_TEMP"
             }

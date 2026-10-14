@@ -4,7 +4,7 @@
 # Updates CHANGELOG.md automatically from commit history, stages, commits & pushes
 # ==============================================================================
 
-set -e
+set -eo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$REPO_ROOT"
@@ -17,8 +17,8 @@ else
 fi
 
 # 1. Pastikan tidak ada secret file yang bocor
-if git status --porcelain | grep -E "\.env|id_ed25519|mcp_config\.json" | grep -v "^!!" >/dev/null 2>&1; then
-    echo -e "\033[0;31m[ERROR] File rahasia (.env / private key / token) terdeteksi akan ikut ter-stage!\033[0m"
+if git status --porcelain | grep -E "\.env|id_ed25519|id_rsa|mcp_config\.json|\.agents" | grep -v "^!!" >/dev/null 2>&1; then
+    echo -e "\033[0;31m[ERROR] File rahasia / development (.env / private key / token / .agents) terdeteksi akan ikut ter-stage!\033[0m"
     echo "Harap periksa .gitignore Anda."
     exit 1
 fi

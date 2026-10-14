@@ -3,7 +3,7 @@
 # Helper Script to Generate Terminal Demo GIF using Charm VHS
 # ==============================================================================
 
-set -e
+set -eo pipefail
 
 REPO_ROOT="$(dirname "$(dirname "$(realpath "$0")")")"
 cd "$REPO_ROOT"

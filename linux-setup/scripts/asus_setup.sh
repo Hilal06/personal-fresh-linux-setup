@@ -5,7 +5,7 @@
 # Konfigurasi: Battery charge limit, Power profile, GPU Mode switcher
 # ==============================================================================
 
-set -e
+set -eo pipefail
 
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 source "$SCRIPT_DIR/env.sh"

@@ -4,7 +4,7 @@
 # Node.js (fnm), Python (uv), Rust (rustup), Go, Java (OpenJDK), PHP (Composer)
 # ==============================================================================
 
-set -e
+set -eo pipefail
 
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 # shellcheck source=linux-setup/scripts/env.sh
@@ -25,7 +25,14 @@ install_fnm_node() {
     export PATH="$HOME/.local/bin:$PATH"
 
     if ! command -v fnm &>/dev/null; then
-        curl -fsSL https://fnm.vercel.app/install | bash -s -- --install-dir "$HOME/.local/bin" --skip-shell
+        local FNM_TMP
+        FNM_TMP="$(create_secure_tmp "fnm-install")"
+        if safe_download "https://fnm.vercel.app/install" "$FNM_TMP/install.sh"; then
+            bash "$FNM_TMP/install.sh" --install-dir "$HOME/.local/bin" --skip-shell
+        else
+            warn "Gagal mengunduh installer fnm."
+        fi
+        rm -rf "$FNM_TMP"
     fi
 
     if [ -x "$HOME/.local/bin/fnm" ]; then
@@ -75,7 +82,14 @@ install_uv_python() {
     export PATH="$HOME/.local/bin:$PATH"
 
     if ! command -v uv &>/dev/null; then
-        curl -LsSf https://astral.sh/uv/install.sh | sh
+        local UV_TMP
+        UV_TMP="$(create_secure_tmp "uv-install")"
+        if safe_download "https://astral.sh/uv/install.sh" "$UV_TMP/install.sh"; then
+            sh "$UV_TMP/install.sh"
+        else
+            warn "Gagal mengunduh installer uv."
+        fi
+        rm -rf "$UV_TMP"
     fi
 
     if [ -x "$HOME/.local/bin/uv" ] || command -v uv &>/dev/null; then
@@ -102,17 +116,24 @@ install_rust() {
     if command -v rustup &>/dev/null || command -v cargo &>/dev/null; then
         success "$(_msg "Rust toolchain sudah terpasang." "Rust toolchain already installed.")"
     else
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
-        export PATH="$HOME/.cargo/bin:$PATH"
+        local RUSTUP_TMP
+        RUSTUP_TMP="$(create_secure_tmp "rustup-install")"
+        if safe_download "https://sh.rustup.rs" "$RUSTUP_TMP/rustup-init.sh"; then
+            sh "$RUSTUP_TMP/rustup-init.sh" -s -- -y --no-modify-path
+            export PATH="$HOME/.cargo/bin:$PATH"
 
-        for rc in "$HOME/.zshrc" "$HOME/.bashrc"; do
-            if [ -f "$rc" ] && ! grep -q '\.cargo/bin' "$rc"; then
-                echo '' >> "$rc"
-                echo '# Rust Cargo environment' >> "$rc"
-                echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> "$rc"
-            fi
-        done
-        success "$(_msg "Rust toolchain (rustup & cargo) berhasil dipasang." "Rust toolchain (rustup & cargo) successfully installed.")"
+            for rc in "$HOME/.zshrc" "$HOME/.bashrc"; do
+                if [ -f "$rc" ] && ! grep -q '\.cargo/bin' "$rc"; then
+                    echo '' >> "$rc"
+                    echo '# Rust Cargo environment' >> "$rc"
+                    echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> "$rc"
+                fi
+            done
+            success "$(_msg "Rust toolchain (rustup & cargo) berhasil dipasang." "Rust toolchain (rustup & cargo) successfully installed.")"
+        else
+            warn "Gagal mengunduh installer Rustup."
+        fi
+        rm -rf "$RUSTUP_TMP"
     fi
 }
 

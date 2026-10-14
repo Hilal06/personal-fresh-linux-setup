@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -eo pipefail
 
 # Wrapper to maintain backwards compatibility with setup_terminal.sh
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"

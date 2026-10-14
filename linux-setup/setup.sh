@@ -3,7 +3,7 @@
 # Fresh Linux Setup Suite - Main Interactive CLI Dashboard
 # ==============================================================================
 
-set -e
+set -eo pipefail
 
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
@@ -74,7 +74,9 @@ done
 
 if [ -n "$CLI_LANG" ]; then
     export SETUP_LANG="$CLI_LANG"
-    echo "$SETUP_LANG" > /tmp/.setup_lang 2>/dev/null || true
+    mkdir -p "${LOG_DIR:-$HOME/.cache/fresh-linux-setup}" 2>/dev/null || true
+    echo "$SETUP_LANG" > "${LOG_DIR:-$HOME/.cache/fresh-linux-setup}/.setup_lang" 2>/dev/null || true
+    chmod 600 "${LOG_DIR:-$HOME/.cache/fresh-linux-setup}/.setup_lang" 2>/dev/null || true
 fi
 
 # Pre-flight Check Mode
@@ -126,7 +128,9 @@ select_language() {
             export SETUP_LANG="id"
             ;;
     esac
-    echo "$SETUP_LANG" > /tmp/.setup_lang 2>/dev/null || true
+    mkdir -p "${LOG_DIR:-$HOME/.cache/fresh-linux-setup}" 2>/dev/null || true
+    echo "$SETUP_LANG" > "${LOG_DIR:-$HOME/.cache/fresh-linux-setup}/.setup_lang" 2>/dev/null || true
+    chmod 600 "${LOG_DIR:-$HOME/.cache/fresh-linux-setup}/.setup_lang" 2>/dev/null || true
 }
 
 if [ -z "$CLI_LANG" ]; then

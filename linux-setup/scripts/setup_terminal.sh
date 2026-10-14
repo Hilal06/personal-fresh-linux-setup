@@ -4,7 +4,7 @@
 # Konfigurasi: Zsh, Starship, Zsh Plugins, Zoxide, FZF, Bat, Eza, FD
 # ==============================================================================
 
-set -e
+set -eo pipefail
 
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 CONFIGS_DIR="$SCRIPT_DIR/../configs"
@@ -20,26 +20,41 @@ install_cli_tools() {
     elif command -v apt-get &>/dev/null || command -v apt &>/dev/null; then
         sudo apt-get update -qq
         sudo apt-get install -y zsh git curl fzf bat fd-find zoxide util-linux
-        # Cek dan pasang eza untuk Ubuntu
+        # Cek dan pasang eza untuk Ubuntu (Noble 24.04+ tersedia di apt default)
         if ! command -v eza &>/dev/null; then
             if ! sudo apt-get install -y eza 2>/dev/null; then
-                info "Menyiapkan repository eza untuk Ubuntu..."
+                info "Menyiapkan repository HTTPS eza untuk Ubuntu..."
                 sudo mkdir -p /etc/apt/keyrings
-                wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc 2>/dev/null | sudo gpg --dearmor --yes -o /etc/apt/keyrings/gierens.gpg 2>/dev/null || true
-                echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list >/dev/null 2>&1 || true
-                sudo apt-get update -qq 2>/dev/null || true
-                sudo apt-get install -y eza >/dev/null 2>&1 || warn "eza tidak tersedia di repo apt, alias ls fallback di .zshrc akan digunakan."
+                local EZA_TMP
+                EZA_TMP="$(create_secure_tmp "eza-repo")"
+                if safe_download "https://raw.githubusercontent.com/eza-community/eza/main/deb.asc" "$EZA_TMP/deb.asc"; then
+                    sudo gpg --dearmor --yes -o /etc/apt/keyrings/gierens.gpg < "$EZA_TMP/deb.asc" 2>/dev/null || true
+                    sudo chmod 644 /etc/apt/keyrings/gierens.gpg 2>/dev/null || true
+                    echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] https://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list >/dev/null 2>&1 || true
+                    sudo apt-get update -qq 2>/dev/null || true
+                    sudo apt-get install -y eza >/dev/null 2>&1 || warn "eza tidak tersedia di repo apt, alias ls fallback di .zshrc akan digunakan."
+                else
+                    warn "Gagal mengunduh GPG key eza. Melewati setup repository eza."
+                fi
+                rm -rf "$EZA_TMP"
             fi
         fi
     else
         warn "Package manager tidak dikenali. Pastikan tool esensial terminal sudah terinstall manual."
     fi
 
-    # Install Starship jika belum ada
+    # Install Starship jika belum ada (Download aman ke direktori temporer)
     if ! command -v starship &>/dev/null; then
-        info "Menginstall Starship prompt..."
-        curl -sS https://starship.rs/install.sh | sh -s -- -y
-        success "Starship prompt berhasil diinstall."
+        info "Menginstall Starship prompt via installer resmi HTTPS..."
+        local STARSHIP_TMP
+        STARSHIP_TMP="$(create_secure_tmp "starship-install")"
+        if safe_download "https://starship.rs/install.sh" "$STARSHIP_TMP/install.sh"; then
+            sh "$STARSHIP_TMP/install.sh" -y
+            success "Starship prompt berhasil diinstall."
+        else
+            warn "Gagal mengunduh installer Starship."
+        fi
+        rm -rf "$STARSHIP_TMP"
     else
         success "Starship prompt sudah terinstall."
     fi
@@ -59,15 +74,15 @@ install_firacode_nerd_font() {
 
     info "FiraCode Nerd Font belum ditemukan. Memulai proses instalasi..."
 
-    # Instalasi langsung dari rilis resmi Nerd Fonts GitHub
+    # Instalasi langsung dari rilis resmi Nerd Fonts GitHub dengan direktori temporer aman
     info "Mengunduh FiraCode Nerd Font dari rilis resmi GitHub..."
     local FONT_DIR="$HOME/.local/share/fonts/NerdFonts"
     local TEMP_DIR
-    TEMP_DIR="$(mktemp -d)"
+    TEMP_DIR="$(create_secure_tmp "nerdfonts")"
 
     mkdir -p "$FONT_DIR"
 
-    if curl -fLo "$TEMP_DIR/FiraCode.zip" "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip"; then
+    if safe_download "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip" "$TEMP_DIR/FiraCode.zip"; then
         info "Mengekstrak FiraCode Nerd Font ke $FONT_DIR..."
         unzip -q -o "$TEMP_DIR/FiraCode.zip" -d "$FONT_DIR" "*.ttf" || unzip -q -o "$TEMP_DIR/FiraCode.zip" -d "$FONT_DIR"
     else

@@ -4,7 +4,7 @@
 # Presets: Minimal Developer, Full Workstation, Gaming & Creator, ASUS ROG Suite
 # ==============================================================================
 
-set -e
+set -eo pipefail
 
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 # shellcheck source=linux-setup/scripts/env.sh

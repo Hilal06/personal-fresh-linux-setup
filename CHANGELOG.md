@@ -4,6 +4,28 @@ Dokumentasi riwayat pembaruan dan otomasi commit proyek `personal-fresh-linux-se
 
 ---
 
+### 🚀 [2026-10-14 22:29:48] - feat(security): harden scripts against supply-chain attacks and code injection
+
+- **Author**: Rifaul <rifaulhilal06@gmail.com>
+- **Branch**: main
+- **Files Changed**:
+  -  M .github/workflows/ci.yml
+  -  M install.sh
+  -  M linux-setup/scripts/asus_setup.sh
+  -  M linux-setup/scripts/dev_runtimes.sh
+  -  M linux-setup/scripts/env.sh
+  -  M linux-setup/scripts/flatpak_apps.sh
+  -  M linux-setup/scripts/git_ssh_setup.sh
+  -  M linux-setup/scripts/maintenance.sh
+  -  M linux-setup/scripts/profiles.sh
+  -  M linux-setup/scripts/rpm_apps.sh
+  -  M linux-setup/scripts/setup_terminal.sh
+  -  M linux-setup/scripts/system_essentials.sh
+  -  M linux-setup/scripts/zsh.sh
+  -  M linux-setup/setup.sh
+  -  M scripts/git-sync.sh
+  -  M scripts/record_demo.sh
+
 ### 🚀 [2026-09-21 12:36:00] - feat(docs): add high-resolution feature screenshots and update TUI documentation
 
 - **Author**: Rifaul <rifaulhilal06@gmail.com>

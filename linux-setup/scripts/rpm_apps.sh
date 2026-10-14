@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -eo pipefail
 
 source "$(dirname "$0")/env.sh"
 
@@ -57,11 +57,17 @@ for choice in "${SELECTED_APPS[@]}"; do
             if command -v agy &>/dev/null; then
                 success "Antigravity CLI (agy) sudah terinstall di: $(which agy)"
             else
-                info "Mengunduh binary resmi Google Antigravity CLI..."
-                curl -fsSL https://antigravity.google/install.sh | bash || {
-                    warn "Pemasangan via install.sh resmi selesai atau memerlukan konfirmasi manual."
-                }
-                success "Setup Google Antigravity CLI selesai. Pastikan ~/.local/bin berada di PATH."
+                info "Mengunduh installer resmi Google Antigravity CLI..."
+                AGY_TMP="$(create_secure_tmp "agy-install")"
+                if safe_download "https://antigravity.google/install.sh" "$AGY_TMP/install.sh"; then
+                    bash "$AGY_TMP/install.sh" || {
+                        warn "Pemasangan via install.sh resmi selesai atau memerlukan konfirmasi manual."
+                    }
+                    success "Setup Google Antigravity CLI selesai. Pastikan ~/.local/bin berada di PATH."
+                else
+                    warn "Gagal mengunduh installer Google Antigravity CLI."
+                fi
+                rm -rf "$AGY_TMP"
             fi
             ;;
         "Google Antigravity IDE (Desktop Application)")
@@ -70,13 +76,13 @@ for choice in "${SELECTED_APPS[@]}"; do
                 success "Google Antigravity IDE sudah terpasang di sistem (/opt/antigravity/antigravity)."
             else
                 info "Mengunduh dan mengonfigurasi installer resmi Antigravity IDE..."
-                curl -fsSL https://antigravity.google/download/linux -o /tmp/antigravity.tar.gz 2>/dev/null || true
-                if [ -s /tmp/antigravity.tar.gz ]; then
+                IDE_TMP="$(create_secure_tmp "antigravity-ide")"
+                if safe_download "https://antigravity.google/download/linux" "$IDE_TMP/antigravity.tar.gz"; then
                     sudo mkdir -p /opt/antigravity
-                    sudo tar -xzf /tmp/antigravity.tar.gz -C /opt/antigravity --strip-components=1 || true
+                    sudo tar -xzf "$IDE_TMP/antigravity.tar.gz" -C /opt/antigravity --strip-components=1 --no-same-owner || true
                     sudo ln -sf /opt/antigravity/antigravity /usr/local/bin/antigravity
-                    rm -f /tmp/antigravity.tar.gz
                 fi
+                rm -rf "$IDE_TMP"
                 # Buat desktop shortcut jika belum ada
                 if [ ! -f /usr/share/applications/antigravity.desktop ] && [ -f /opt/antigravity/antigravity ]; then
                     sudo tee /usr/share/applications/antigravity.desktop >/dev/null << 'DESKTOP_EOF'
@@ -102,13 +108,19 @@ DESKTOP_EOF
                 sudo dnf check-update || true
                 sudo dnf install -y code
             elif [ "$DISTRO_TYPE" = "ubuntu" ]; then
-                sudo apt-get install -y wget gpg apt-transport-https
-                wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /tmp/packages.microsoft.gpg
-                sudo install -D -o root -g root -m 644 /tmp/packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
-                rm -f /tmp/packages.microsoft.gpg
-                echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
-                sudo apt-get update -qq
-                sudo apt-get install -y code
+                sudo apt-get install -y ca-certificates curl gpg apt-transport-https
+                VSC_TMP="$(create_secure_tmp "vscode-keyring")"
+                sudo mkdir -p /etc/apt/keyrings
+                if safe_download "https://packages.microsoft.com/keys/microsoft.asc" "$VSC_TMP/microsoft.asc"; then
+                    gpg --dearmor < "$VSC_TMP/microsoft.asc" > "$VSC_TMP/packages.microsoft.gpg" 2>/dev/null || true
+                    sudo install -D -o root -g root -m 644 "$VSC_TMP/packages.microsoft.gpg" /etc/apt/keyrings/packages.microsoft.gpg
+                    echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
+                    sudo apt-get update -qq
+                    sudo apt-get install -y code
+                else
+                    warn "Gagal mengunduh GPG key Microsoft untuk VS Code."
+                fi
+                rm -rf "$VSC_TMP"
             fi
             ;;
         "Docker Engine & Docker Compose")

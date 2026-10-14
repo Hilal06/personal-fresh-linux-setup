@@ -5,7 +5,7 @@
 #   curl -fsSL https://raw.githubusercontent.com/Hilal06/personal-fresh-linux-setup/main/install.sh | bash
 # ==============================================================================
 
-set -e
+set -eo pipefail
 
 # Fallback untuk environment root / container minimal tanpa command sudo
 if ! command -v sudo &>/dev/null && [ "${EUID:-$(id -u)}" -eq 0 ]; then
@@ -47,7 +47,11 @@ else
         git clone --depth 1 "$REPO_URL" "$INSTALL_DIR" --quiet
     else
         echo "[INFO] Mengunduh archive utilitas via curl..."
-        curl -fsSL "$TARBALL_URL" | tar -xz -C "$INSTALL_DIR" --strip-components=1
+        TMP_TAR="$(mktemp -t setup-repo.XXXXXX.tar.gz)"
+        chmod 600 "$TMP_TAR"
+        curl --proto '=https' --tlsv1.2 -fsSL "$TARBALL_URL" -o "$TMP_TAR"
+        tar -xzf "$TMP_TAR" -C "$INSTALL_DIR" --strip-components=1 --no-same-owner
+        rm -f "$TMP_TAR"
     fi
 fi
 
@@ -61,7 +65,14 @@ exec </dev/tty
 "$INSTALL_DIR/linux-setup/setup.sh" "$@" || true
 
 # 4. Konfirmasi Pembersihan Direktori di Akhir Sesi
-[ -f /tmp/.setup_lang ] && SETUP_LANG="$(cat /tmp/.setup_lang 2>/dev/null)" && rm -f /tmp/.setup_lang
+LANG_STATE_FILE="$HOME/.cache/fresh-linux-setup/.setup_lang"
+if [ -f "$LANG_STATE_FILE" ]; then
+    SETUP_LANG="$(cat "$LANG_STATE_FILE" 2>/dev/null)"
+    rm -f "$LANG_STATE_FILE"
+elif [ -f /tmp/.setup_lang ]; then
+    SETUP_LANG="$(cat /tmp/.setup_lang 2>/dev/null)"
+    rm -f /tmp/.setup_lang
+fi
 
 CLEAN_PROMPT="Apakah Anda ingin menghapus direktori repositori utilitas ini ($INSTALL_DIR)?"
 CLEAN_INFO="[INFO] Membersihkan direktori instalasi..."

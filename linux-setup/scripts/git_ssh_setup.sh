@@ -4,7 +4,7 @@
 # Mengonfigurasi nama/email Git, default branch, dan ed25519 SSH Key
 # ==============================================================================
 
-set -e
+set -eo pipefail
 
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 source "$SCRIPT_DIR/env.sh"
@@ -105,9 +105,17 @@ configure_ssh_key() {
     if [ -f "$SSH_KEY" ]; then
         info "SSH Key ed25519 sudah ditemukan di: $SSH_KEY"
     else
-        if gum confirm "SSH Key belum ditemukan. Generate SSH Key baru (ed25519)?"; then
+        if gum confirm "$(_msg "SSH Key belum ditemukan. Generate SSH Key baru (ed25519)?" "SSH Key not found. Generate new SSH Key (ed25519)?")"; then
+            info "$(_msg "Masukkan Passphrase untuk mengamankan SSH Key (opsional namun disarankan):" "Enter Passphrase to protect SSH Key (optional but recommended):")"
+            info "$(_msg "Tekan [Enter] jika ingin tanpa passphrase." "Press [Enter] if you prefer no passphrase.")"
+            local SSH_PASS
+            SSH_PASS="$(gum input --password --placeholder "$(_msg "Passphrase (opsional)" "Passphrase (optional)")" || true)"
+            if [ -z "$SSH_PASS" ]; then
+                warn "$(_msg "Peringatan: SSH Key dibuat tanpa passphrase. Lindungi akses ke perangkat Anda!" "Warning: SSH Key created without passphrase. Secure physical and remote access to your device!")"
+            fi
             info "Membuat SSH Key ed25519..."
-            ssh-keygen -t ed25519 -C "$GIT_EMAIL" -f "$SSH_KEY" -N ""
+            ssh-keygen -t ed25519 -C "$GIT_EMAIL" -f "$SSH_KEY" -N "$SSH_PASS"
+            chmod 700 "$SSH_DIR"
             chmod 600 "$SSH_KEY"
             chmod 644 "$SSH_KEY.pub"
             success "SSH Key baru berhasil dibuat: $SSH_KEY"

@@ -4,7 +4,7 @@
 # Pembersihan cache, kernel lama, flatpak unused, status hardware & services
 # ==============================================================================
 
-set -e
+set -eo pipefail
 
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 source "$SCRIPT_DIR/env.sh"
@@ -25,6 +25,7 @@ CHOICES=$(gum choose --no-limit \
     --selected.foreground="82" \
     "$(_msg "⬅️   [Kembali ke Menu Utama]" "⬅️   [Back to Main Menu]")" \
     "$(_msg "System Health Check (Hardware, Services, GPU & Btrfs Status)" "System Health Check (Hardware, Services, GPU & Btrfs Status)")" \
+    "$(_msg "Security Audit & Firewall Status (UFW / firewalld & Open Ports)" "Security Audit & Firewall Status (UFW / firewalld & Open Ports)")" \
     "$(_msg "Clean Package Caches & Old Kernels (DNF / APT & Flatpak Clean)" "Clean Package Caches & Old Kernels (DNF / APT & Flatpak Clean)")" \
     "$(_msg "Btrfs Scrub & Filesystem Health Check" "Btrfs Scrub & Filesystem Health Check")" \
     "$(_msg "Buat Snapshot Sistem Manual (Snapper / Timeshift)" "Create Manual System Snapshot (Snapper / Timeshift)")" \
@@ -82,6 +83,59 @@ for task in "${SELECTED_TASKS[@]}"; do
             echo ""
             info "$(_msg "--- [Penggunaan Memori & Swap / ZRAM] ---" "--- [Memory & Swap / ZRAM Usage] ---")"
             free -h
+            ;;
+
+        *"Security Audit"*)
+            echo ""
+            gum style --foreground 196 --bold ">>> $(_msg "Menjalankan Audit Keamanan Sistem..." "Running System Security Audit...")"
+
+            # 1. Firewall Status
+            echo ""
+            info "$(_msg "--- [Status Firewall] ---" "--- [Firewall Status] ---")"
+            if command -v ufw &>/dev/null; then
+                sudo ufw status verbose 2>/dev/null || ufw status 2>/dev/null || true
+            elif command -v firewall-cmd &>/dev/null; then
+                if systemctl is-active --quiet firewalld; then
+                    echo -e "  [+] firewalld : \033[0;32mRUNNING / ACTIVE\033[0m"
+                    sudo firewall-cmd --state 2>/dev/null || true
+                    sudo firewall-cmd --get-active-zones 2>/dev/null || true
+                else
+                    echo -e "  [-] firewalld : \033[0;31mINACTIVE / NOT RUNNING\033[0m"
+                fi
+            else
+                warn "$(_msg "Tidak ditemukan UFW atau firewalld di sistem." "Neither UFW nor firewalld found on this system.")"
+            fi
+
+            # 2. Open Listening Ports
+            echo ""
+            info "$(_msg "--- [Port & Socket Listening Lokal] ---" "--- [Local Listening Ports & Sockets] ---")"
+            if command -v ss &>/dev/null; then
+                ss -tuln | grep -E 'State|LISTEN' || true
+            fi
+
+            # 3. SSH Key File Permissions
+            echo ""
+            info "$(_msg "--- [Pemeriksaan Izin File SSH ~/.ssh] ---" "--- [SSH File Permissions Check ~/.ssh] ---")"
+            if [ -d "$HOME/.ssh" ]; then
+                SSH_PERM="$(stat -c "%a" "$HOME/.ssh" 2>/dev/null || echo 'Unknown')"
+                if [ "$SSH_PERM" = "700" ]; then
+                    echo -e "  [+] ~/.ssh folder permission: \033[0;32m$SSH_PERM (Aman / Secure)\033[0m"
+                else
+                    echo -e "  [!] ~/.ssh folder permission: \033[0;33m$SSH_PERM (Disarankan: 700)\033[0m"
+                fi
+                for priv in "$HOME/.ssh/id_"*; do
+                    if [[ "$priv" != *".pub" ]] && [ -f "$priv" ]; then
+                        P_PERM="$(stat -c "%a" "$priv" 2>/dev/null || echo 'Unknown')"
+                        if [ "$P_PERM" = "600" ]; then
+                            echo -e "  [+] $priv: \033[0;32m$P_PERM (Aman / Secure)\033[0m"
+                        else
+                            echo -e "  [!] $priv: \033[0;31m$P_PERM (Bahaya! Disarankan: 600)\033[0m"
+                        fi
+                    fi
+                done
+            else
+                info "$(_msg "Direktori ~/.ssh belum ada." "Directory ~/.ssh does not exist yet.")"
+            fi
             ;;
 
         "Clean Package Caches & Old Kernels"*)
